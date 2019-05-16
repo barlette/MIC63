@@ -79,8 +79,8 @@ int main(int argc, char *argv[])
                         }
                         line.erase(0, pos + delimiter.length()); 
                     }
-                    if(nElement < 8){ // caso não haja todos os elementos necessários e.g. MM%, SOURCE, GATE, DRAIN, BACK GATE, WIDTH, LENGTH, NUMBER OF FINS <- 8 elementos
-                        cerr 	<< "invalid transistor instance at line: " << curLine << file_name;
+                    if(nElement != 8){ // caso não haja todos os elementos necessários ou haja elementos a mais e.g. MM%, SOURCE, GATE, DRAIN, BACK GATE, WIDTH, LENGTH, NUMBER OF FINS <- 8 elementos
+                        cerr 	<< "invalid transistor instance at line: " << curLine << ":" << file_name;
                         return -1;
                     } else{
                         temp.set_drain(transistor_temp[0]);
@@ -90,7 +90,14 @@ int main(int argc, char *argv[])
                         if(!transistor_temp[4].compare("nmos_rvt"))
                         {
                             temp.set_type('N');
-                        } else temp.set_type('P');
+                        } else if(!transistor_temp[4].compare("pmos_rvt"))
+                        {
+                            temp.set_type('P');
+                        } else 
+                        {
+                            cerr 	<< "invalid transistor instance\n";
+                            return -1;
+                        }
                         temp.set_width(int_ext(transistor_temp[5]));
                         temp.set_length(int_ext(transistor_temp[6]));
                         temp.set_nfin(int_ext(line));
