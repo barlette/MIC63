@@ -21,16 +21,16 @@
 #include <regex>
 #include <list>
 #include <iterator>
+#include "grapher.h"
 
 #ifndef STACK_H
 #define STACK_H
-
-class Stack{
-public:
-    std::list<Transistor> nStack;
-    std::list<Transistor> pStack;
-    
-};
+ 
+list<Transistor> nStack(list<Transistor> ts);
+list<Transistor> pStack(list<Transistor> ts);
+vector<string> indexNetlist (list<Transistor> ts);
+int findIndex(vector<string> netlist, string u);
+void printGraph(Grapher graph, int N);
 
 #endif /* STACK_H */
 

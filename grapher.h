@@ -26,10 +26,43 @@
 #include <list>
 #include <iterator>
 
-Stack divide_into_stacks(list<Transistor> ts);
-vector<string> indexNetlist (list<Transistor> ts);
-int findIndex(vector<string> adj, string u);
-vector<int> grapher(list<Transistor> stack);
-vector<int> addEdge(vector<int> adj, string u, string v, vector<string> netlist);
-#endif /* GRAPHER_H */
+//vector<int> adj;
+using namespace std;
 
+struct Edge {
+    int src, dest;
+};
+
+class Grapher
+{
+public:
+    vector<vector<int>> adj;
+    Grapher(list<Transistor> stack, vector<string> netlist){
+        adj.resize(netlist.size());
+        std::list<Transistor>::iterator it;
+        vector<Edge> ed;
+        Edge temp;
+        for(it = stack.begin(); it != stack.end(); it++){
+            temp.dest =  findIndex(netlist, it->get_drain());
+            temp.src  =  findIndex(netlist, it->get_gate());
+            ed.push_back(temp);
+            
+            temp.dest = findIndex(netlist, it->get_gate());
+            temp.src = findIndex(netlist, it->get_drain());
+            ed.push_back(temp);
+            
+            temp.dest = findIndex(netlist, it->get_source());
+            temp.src = findIndex(netlist, it->get_gate());
+            ed.push_back(temp);
+            
+            temp.dest = findIndex(netlist, it->get_gate());
+            temp.src = findIndex(netlist, it->get_source());
+            ed.push_back(temp);
+        }
+        
+        for(auto &edge: ed){
+            adj[edge.src].push_back(edge.dest);
+        }
+    }
+};
+#endif /* GRAPHER_H */

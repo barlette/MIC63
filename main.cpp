@@ -25,15 +25,25 @@ int main(int argc, char *argv[])
         { 
             fileName = argv[1];
         }
+        list<Transistor> nSt;
+        list<Transistor> pSt;
+
         
         list<Transistor> list_transistors(parser(fileName));
-        Stack st(divide_into_stacks(list_transistors));
-        //vector<string> netlist = indexNetlist(st.nStack);
         
-        for (auto i = netlist.begin(); i != netlist.end(); ++i)
+        nSt = nStack(list_transistors); 
+        pSt = pStack(list_transistors);
+
+        vector<string> netlist_n = indexNetlist(nSt);
+        vector<string> netlist_p = indexNetlist(pSt);
+        
+        for (auto i = netlist_p.begin(); i != netlist_p.end(); ++i)
             std::cout << *i << ' ';
 
         //cout << findIndex(netlist, "A") << "\n";
+        Grapher g(nSt, netlist_n);
+    
+        printGraph(g, netlist_n.size());
         
-        vector<int> graph = 
+        return 0;
 }
