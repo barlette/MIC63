@@ -11,8 +11,8 @@
  * Created on May 14, 2019, 3:38 PM
  */
 
-#ifndef NEWFILE_H
-#define NEWFILE_H
+#ifndef PARSER_H
+#define PARSER_H
 
 #define sub_circuit_start ".SUBCKT"
 #define transistor "MM"
@@ -20,6 +20,13 @@
 #define w "w="
 #define l "l="
 #define fin "nfin="
+#include <list>
+#include "circuit.h"
+
+
+int int_ext(std::string input);
+void print_list(list<Transistor> ts);
+list<Transistor> parser(string fileName);
 
 #endif /* NEWFILE_H */
 

@@ -7,10 +7,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/bar/NetBeansProjects/MIC63/circuit.h</file>
-            <file>file:/home/bar/NetBeansProjects/MIC63/parser.cpp</file>
-            <file>file:/home/bar/NetBeansProjects/MIC63/parser.h</file>
-            <file>file:/home/bar/Documents/MIC63/ST2.sp</file>
+            <file>file:/home/brltt/Documents/MIC63/main.cpp</file>
+            <file>file:/home/brltt/Documents/MIC63/circuit.h</file>
+            <file>file:/home/brltt/Documents/MIC63/grapher.h</file>
+            <file>file:/home/brltt/Documents/MIC63/parser.cpp</file>
+            <file>file:/home/brltt/Documents/MIC63/grapher.cpp</file>
+            <file>file:/home/brltt/Documents/MIC63/stack.h</file>
         </group>
     </open-files>
 </project-private>

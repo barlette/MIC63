@@ -34,27 +34,25 @@ void print_list(list<Transistor> ts){
     }
 }
 
-int main(int argc, char *argv[])
+//int parser(int argc, char *argv[])
+
+list<Transistor> parser(string fileName)
 {
     string line, token, delimiter = " ";
     string transistor_temp[8];
     size_t pos;
     int curLine = 0;
-    std::string file_name = "default";
-    //vector <Transistor> c;
     Transistor temp(" "," "," "," ",' ',0,0,0);
     list<Transistor> list_transistors;
-    if (argc > 1) { file_name = argv[1]; }
-    //cout << file_name + "\n";
-    ifstream inFile(file_name.c_str() );
+    ifstream inFile(fileName.c_str() );
     
     
     if(!inFile)
     {
-        cerr 	<< "unable to open input file: " << file_name;
-	return -1;
-    }
-
+        cerr << "unable to open input file" << endl;
+	
+    } else {
+    try{
     while(!inFile.eof())
     {
 	curLine++;
@@ -79,10 +77,10 @@ int main(int argc, char *argv[])
                         }
                         line.erase(0, pos + delimiter.length()); 
                     }
+                    
                     if(nElement != 8){ // caso não haja todos os elementos necessários ou haja elementos a mais e.g. MM%, SOURCE, GATE, DRAIN, BACK GATE, WIDTH, LENGTH, NUMBER OF FINS <- 8 elementos
-                        cerr 	<< "invalid transistor instance at line: " << curLine << ":" << file_name;
-                        return -1;
-                    } else{
+                        throw "invalid transistor instance";
+                    } else{ 
                         temp.set_drain(transistor_temp[0]);
                         temp.set_gate(transistor_temp[1]);
                         temp.set_source(transistor_temp[2]);
@@ -95,18 +93,23 @@ int main(int argc, char *argv[])
                             temp.set_type('P');
                         } else 
                         {
-                            cerr 	<< "invalid transistor instance\n";
-                            return -1;
+                            throw "invalid transistor instance";
                         }
                         temp.set_width(int_ext(transistor_temp[5]));
                         temp.set_length(int_ext(transistor_temp[6]));
                         temp.set_nfin(int_ext(line));
                     }
+
+                
                     getline(inFile, line);
                     list_transistors.push_back(temp); // insere numa lista
                 }
+                }
             }
-        }
-    } 
+            }
+        } catch (const char *msg){
+        cerr << msg << endl; }
+    }       
     print_list(list_transistors);
+    return list_transistors;
 }

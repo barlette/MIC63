@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = MIC631.0.0
-DISTDIR = /home/bar/NetBeansProjects/MIC63/build/Debug/GNU-Linux/MIC631.0.0
+DISTDIR = /home/brltt/Documents/MIC63/build/Debug/GNU-Linux/MIC631.0.0
 LINK          = g++
 LFLAGS        = 
 LIBS          = $(SUBLIBS) -lQt5Widgets -lQt5Gui -lQt5Core /usr/lib/libGL.so -lpthread   
@@ -52,8 +52,12 @@ OBJECTS_DIR   = build/Debug/GNU-Linux/
 
 ####### Files
 
-SOURCES       = parser.cpp 
-OBJECTS       = build/Debug/GNU-Linux/parser.o
+SOURCES       = grapher.cpp \
+		main.cpp \
+		parser.cpp 
+OBJECTS       = build/Debug/GNU-Linux/grapher.o \
+		build/Debug/GNU-Linux/main.o \
+		build/Debug/GNU-Linux/parser.o
 DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/unix.conf \
 		/usr/lib/qt/mkspecs/common/linux.conf \
@@ -66,7 +70,6 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/modules/qt_KAuth.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KCoreAddons.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KItemModels.pri \
-		/usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent.pri \
@@ -178,7 +181,11 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/yacc.prf \
 		/usr/lib/qt/mkspecs/features/lex.prf \
 		nbproject/nbproject/qt-Debug.pro circuit.h \
-		parser.h parser.cpp
+		grapher.h \
+		parser.h \
+		stack.h grapher.cpp \
+		main.cpp \
+		parser.cpp
 QMAKE_TARGET  = MIC63
 DESTDIR       = dist/Debug/GNU-Linux/
 TARGET        = dist/Debug/GNU-Linux/MIC63
@@ -203,7 +210,6 @@ qttmp-Debug.mk: nbproject/qt-Debug.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf 
 		/usr/lib/qt/mkspecs/modules/qt_KAuth.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KCoreAddons.pri \
 		/usr/lib/qt/mkspecs/modules/qt_KItemModels.pri \
-		/usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri \
 		/usr/lib/qt/mkspecs/modules/qt_lib_concurrent.pri \
@@ -331,7 +337,6 @@ qttmp-Debug.mk: nbproject/qt-Debug.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf 
 /usr/lib/qt/mkspecs/modules/qt_KAuth.pri:
 /usr/lib/qt/mkspecs/modules/qt_KCoreAddons.pri:
 /usr/lib/qt/mkspecs/modules/qt_KItemModels.pri:
-/usr/lib/qt/mkspecs/modules/qt_KWindowSystem.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_accessibility_support_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_bootstrap_private.pri:
 /usr/lib/qt/mkspecs/modules/qt_lib_concurrent.pri:
@@ -461,8 +466,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents circuit.h parser.h $(DISTDIR)/
-	$(COPY_FILE) --parents parser.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents circuit.h grapher.h parser.h stack.h $(DISTDIR)/
+	$(COPY_FILE) --parents grapher.cpp main.cpp parser.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -511,6 +516,17 @@ compiler_lex_clean:
 compiler_clean: compiler_moc_predefs_clean 
 
 ####### Compile
+
+build/Debug/GNU-Linux/grapher.o: grapher.cpp parser.h \
+		circuit.h \
+		stack.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/Debug/GNU-Linux/grapher.o grapher.cpp
+
+build/Debug/GNU-Linux/main.o: main.cpp parser.h \
+		circuit.h \
+		grapher.h \
+		stack.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/Debug/GNU-Linux/main.o main.cpp
 
 build/Debug/GNU-Linux/parser.o: parser.cpp parser.h \
 		circuit.h
