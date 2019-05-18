@@ -11,6 +11,9 @@
  * Created on May 16, 2019, 8:43 PM
  */
 
+#ifndef STACK_H
+#define STACK_H
+
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -23,14 +26,10 @@
 #include <iterator>
 #include "grapher.h"
 
-#ifndef STACK_H
-#define STACK_H
- 
 list<Transistor> nStack(list<Transistor> ts);
 list<Transistor> pStack(list<Transistor> ts);
 vector<string> indexNetlist (list<Transistor> ts);
-int findIndex(vector<string> netlist, string u);
-void printGraph(Grapher graph, int N);
+//int findIndex(vector<string> netlist, string u);
 
 #endif /* STACK_H */
 

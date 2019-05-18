@@ -17,14 +17,14 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include "parser.h"
-#include "circuit.h"
-#include "stack.h"
 #include <vector>
 #include <string>
 #include <regex>
 #include <list>
 #include <iterator>
+//#include "parser.h"
+#include "circuit.h"
+//#include "stack.h"
 
 //vector<int> adj;
 using namespace std;
@@ -37,32 +37,29 @@ class Grapher
 {
 public:
     vector<vector<int>> adj;
-    Grapher(list<Transistor> stack, vector<string> netlist){
-        adj.resize(netlist.size());
-        std::list<Transistor>::iterator it;
-        vector<Edge> ed;
-        Edge temp;
-        for(it = stack.begin(); it != stack.end(); it++){
-            temp.dest =  findIndex(netlist, it->get_drain());
-            temp.src  =  findIndex(netlist, it->get_gate());
-            ed.push_back(temp);
-            
-            temp.dest = findIndex(netlist, it->get_gate());
-            temp.src = findIndex(netlist, it->get_drain());
-            ed.push_back(temp);
-            
-            temp.dest = findIndex(netlist, it->get_source());
-            temp.src = findIndex(netlist, it->get_gate());
-            ed.push_back(temp);
-            
-            temp.dest = findIndex(netlist, it->get_gate());
-            temp.src = findIndex(netlist, it->get_source());
-            ed.push_back(temp);
-        }
+    Grapher(vector<Edge> ed, int N){
+        adj.resize(N);
         
         for(auto &edge: ed){
             adj[edge.src].push_back(edge.dest);
         }
     }
+    
+    //void DFSUtil(int v, bool visited[]) 
+    //{ 
+    // Mark the current node as visited and print it 
+    //visited[v] = true; 
+  
+    // Recur for all the vertices adjacent to this vertex 
+    //vector<int>::iterator i; 
+    //for (i = adj[v].begin(); i != adj[v].end(); ++i) 
+    //    if (!visited[*i]) 
+    //        DFSUtil(*i, visited); 
+    //} 
+    
 };
+
+int findIndex(vector<string> netlist, string u);
+vector<Edge> consEdge(list<Transistor> stack, vector<string> netlist);
+void printGraph(Grapher graph, int N);
 #endif /* GRAPHER_H */

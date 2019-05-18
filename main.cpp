@@ -37,13 +37,16 @@ int main(int argc, char *argv[])
         vector<string> netlist_n = indexNetlist(nSt);
         vector<string> netlist_p = indexNetlist(pSt);
         
+        for (auto i = netlist_n.begin(); i != netlist_n.end(); ++i)
+            std::cout << *i << ' ';
+        std::cout << "\n";
+        Grapher gn(consEdge(nSt, netlist_n), netlist_n.size());
+        printGraph(gn, netlist_n.size());
+
         for (auto i = netlist_p.begin(); i != netlist_p.end(); ++i)
             std::cout << *i << ' ';
-
-        //cout << findIndex(netlist, "A") << "\n";
-        Grapher g(nSt, netlist_n);
-    
-        printGraph(g, netlist_n.size());
-        
+        std::cout << "\n";
+        Grapher gp(consEdge(pSt, netlist_p), netlist_p.size());
+        printGraph(gp, netlist_p.size());
         return 0;
 }

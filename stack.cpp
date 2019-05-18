@@ -44,15 +44,6 @@ list<Transistor> pStack(list<Transistor> ts)
     return p;
 }
 
-int findIndex(vector<string> netlist, string u){
-    
-    auto it = find(netlist.begin(), netlist.end(), u);
-    
-    if(it != netlist.end()){
-        return distance(netlist.begin(), it);
-    } else return -1;
-}
-
 vector<string> indexNetlist (list<Transistor> ts){
     vector<string> net_index;
     std::list<Transistor>::iterator it;
@@ -72,16 +63,3 @@ vector<string> indexNetlist (list<Transistor> ts){
     return net_index;
 }
 
-void printGraph(Grapher graph, int N){
-
-    for (int i = 0; i < N; i++)
-    {
-	// print current vertex number
-	cout << i << " --> ";
-
-	// print all neighboring vertices of vertex i
-        for (int v : graph.adj[i])
-            cout << v << " ";
-        cout << endl;
-    }
-}
