@@ -5,14 +5,14 @@
  */
 
 /* 
- * File:   stack.h
- * Author: brltt
+ * File:   placement.h
+ * Author: bar
  *
- * Created on May 16, 2019, 8:43 PM
+ * Created on May 18, 2019, 7:50 PM
  */
 
-#ifndef STACK_H
-#define STACK_H
+#ifndef PLACEMENT_H
+#define PLACEMENT_H
 
 #include <fstream>
 #include <iomanip>
@@ -22,13 +22,13 @@
 #include <vector>
 #include <string>
 #include <regex>
+#include <list>
 #include <iterator>
 #include "grapher.h"
+#include "stack.h"
 
-vector<Transistor> nStack(vector<Transistor> ts);
-vector<Transistor> pStack(vector<Transistor> ts);
-vector<string> indexNetlist (vector<Transistor> ts);
-//int findIndex(vector<string> netlist, string u);
-int detectDuality(vector<Transistor> ns, vector<Transistor> ps);
-#endif /* STACK_H */
+void place(string fileName);
+
+
+#endif /* PLACEMENT_H */
 

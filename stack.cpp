@@ -16,11 +16,11 @@
 #include "stack.h"
 #include "grapher.h"
 
-list<Transistor> nStack(list<Transistor> ts)
+vector<Transistor> nStack(vector<Transistor> ts)
 {
-    list<Transistor> n;
-    std::list<Transistor>::iterator it;
-    for(it = ts.begin(); it != ts.end(); it++){
+    vector<Transistor> n;
+
+    for(auto it = ts.begin(); it != ts.end(); it++){
         if(it->get_type() == 'N') n.push_back(Transistor(it->get_drain(), it->get_gate(), it->get_source(), it->get_bgate(), it->get_type(), it->get_width(), it->get_length(), it->get_nfin()));
     }
     
@@ -30,24 +30,24 @@ list<Transistor> nStack(list<Transistor> ts)
     return n;
 }
 
-list<Transistor> pStack(list<Transistor> ts)
+vector<Transistor> pStack(vector<Transistor> ts)
 {
-    list<Transistor> p;
-    std::list<Transistor>::iterator it;
-    for(it = ts.begin(); it != ts.end(); it++){
+    vector<Transistor> p;
+
+    for(auto it = ts.begin(); it != ts.end(); it++){
         if(it->get_type() == 'P') p.push_back(Transistor(it->get_drain(), it->get_gate(), it->get_source(), it->get_bgate(), it->get_type(), it->get_width(), it->get_length(), it->get_nfin()));
     }
     
-    cout << "stack N: \n";
+    cout << "stack P: \n";
     print_list(p);
     
     return p;
 }
 
-vector<string> indexNetlist (list<Transistor> ts){
+vector<string> indexNetlist (vector<Transistor> ts){
     vector<string> net_index;
-    std::list<Transistor>::iterator it;
-    for(it = ts.begin(); it != ts.end(); it++){
+
+    for(auto it = ts.begin(); it != ts.end(); it++){
         if(find(net_index.begin(), net_index.end(), it->get_drain()) == net_index.end()){
             net_index.push_back(it->get_drain());
         }
@@ -63,3 +63,26 @@ vector<string> indexNetlist (list<Transistor> ts){
     return net_index;
 }
 
+int detectDuality(vector<Transistor> ns, vector<Transistor> ps){
+    vector<bool> pv[ps.size()], nv[ns.size()];
+    vector<string> ngates, pgates;
+    int dual = 0;
+    
+    // if dual = 1 there are the number of p transistors and n transistors are the same;
+    if(ps.size() == ns.size()){
+        cout << "Same number of P and N transistors \n";
+        dual = 1;
+    }
+    for(auto it = ns.begin(); it != ns.end(); it++){
+        ngates.push_back(it->get_gate());
+    }
+    for(auto it = ps.begin(); it != ps.end(); it++){
+        pgates.push_back(it->get_gate());
+    }
+    
+    if(pgates == ngates){
+        cout << "Same gate signals for P and N stacks\n";
+        dual = 2;
+    }
+    return dual;
+}

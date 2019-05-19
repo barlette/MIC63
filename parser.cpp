@@ -27,23 +27,22 @@ int int_ext(std::string input){
     return (std::stoi(output));
 }
 
-void print_list(list<Transistor> ts){
-    std::list<Transistor>::iterator it;
-    for(it = ts.begin(); it != ts.end(); it++){
+void print_list(vector<Transistor> ts){
+    for(auto it = ts.begin(); it != ts.end(); it++){
         cout << it->get_type() << " " << it->get_drain() << " " << it->get_gate() << " " << it->get_source() << " " << it->get_bgate() << " " << it->get_width() <<  " " << it->get_length() << " " << it->get_nfin() << " \n";
     }
 }
 
 //int parser(int argc, char *argv[])
 
-list<Transistor> parser(string fileName)
+vector<Transistor> parser(string fileName)
 {
     string line, token, delimiter = " ";
     string transistor_temp[8];
     size_t pos;
     int curLine = 0;
     Transistor temp(" "," "," "," ",' ',0,0,0);
-    list<Transistor> list_transistors;
+    vector<Transistor> list_transistors;
     ifstream inFile(fileName.c_str() );
     
     

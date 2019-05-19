@@ -25,8 +25,8 @@
 
 
 int int_ext(std::string input);
-void print_list(list<Transistor> ts);
-list<Transistor> parser(string fileName);
+void print_list(vector<Transistor> ts);
+vector<Transistor> parser(string fileName);
 
 #endif /* NEWFILE_H */
 

@@ -25,11 +25,10 @@ int findIndex(vector<string> netlist, string u){
     } else return -1;
 }
 
-vector<Edge> consEdge(list<Transistor> stack, vector<string> netlist){
-        std::list<Transistor>::iterator it;
+vector<Edge> consEdge(vector<Transistor> stack, vector<string> netlist){
         vector<Edge> ed;
         Edge temp;
-        for(it = stack.begin(); it != stack.end(); it++){
+        for(auto it = stack.begin(); it != stack.end(); it++){
             temp.dest =  findIndex(netlist, it->get_drain());
             temp.src  =  findIndex(netlist, it->get_gate());
             ed.push_back(temp);
@@ -48,6 +47,9 @@ vector<Edge> consEdge(list<Transistor> stack, vector<string> netlist){
         }
         return ed;
 }
+
+
+
 
 void printGraph(Grapher graph, int N){
 
