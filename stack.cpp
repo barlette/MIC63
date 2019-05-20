@@ -44,24 +44,32 @@ vector<Transistor> pStack(vector<Transistor> ts)
     return p;
 }
 
-vector<string> indexNetlist (vector<Transistor> ts){
-    vector<string> net_index;
-
+vector<Net> indexNetlist (vector<Transistor> ts){
+    vector<Net> net_index;
+    
+    Net temp;
+ 
     for(auto it = ts.begin(); it != ts.end(); it++){
-        if(find(net_index.begin(), net_index.end(), it->get_drain()) == net_index.end()){
-            net_index.push_back(it->get_drain());
-        }
+        temp.name = it->get_drain();
+        temp.type = ACTIVE;
+        temp.wTransistor = it - ts.begin();
+        net_index.push_back(temp);
+
+        temp.name = it->get_gate();
+        temp.type = GATE;
+        temp.wTransistor = it - ts.begin();
+        net_index.push_back(temp);
         
-        if(find(net_index.begin(), net_index.end(), it->get_gate()) == net_index.end()){
-            net_index.push_back(it->get_gate());
-        }
-        
-        if(find(net_index.begin(), net_index.end(), it->get_source()) == net_index.end()){
-            net_index.push_back(it->get_source());
-        }
+        temp.name = it->get_source();
+        temp.type = ACTIVE;
+        temp.wTransistor = it - ts.begin();
+        net_index.push_back(temp);
     }
+    
     return net_index;
 }
+
+
 
 int detectDuality(vector<Transistor> ns, vector<Transistor> ps){
     vector<bool> pv[ps.size()], nv[ns.size()];
@@ -86,3 +94,4 @@ int detectDuality(vector<Transistor> ns, vector<Transistor> ps){
     }
     return dual;
 }
+

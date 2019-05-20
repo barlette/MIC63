@@ -27,7 +27,7 @@
 
 vector<Transistor> nStack(vector<Transistor> ts);
 vector<Transistor> pStack(vector<Transistor> ts);
-vector<string> indexNetlist (vector<Transistor> ts);
+vector<Net> indexNetlist (vector<Transistor> ts);
 //int findIndex(vector<string> netlist, string u);
 int detectDuality(vector<Transistor> ns, vector<Transistor> ps);
 #endif /* STACK_H */

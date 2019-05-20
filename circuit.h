@@ -19,7 +19,17 @@
 #include<fstream>
 #include <vector>
 #include <string>
+#define GATE 2
+#define ACTIVE 1
+#define SAME_TRAN 0
+
 using namespace std;
+
+struct Net{
+    string name;
+    int type;
+    int wTransistor;
+};
 
 class Transistor
 {
@@ -27,6 +37,7 @@ private:
 	char type;
 	string drain, source, gate, bgate;
 	int width, length, nfin;
+        bool visited = false;
         
 public:
 	Transistor(string drain, string gate, string source, string bgate, char type, int width, int length, int nfin){

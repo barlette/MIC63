@@ -29,112 +29,79 @@
 //vector<int> adj;
 using namespace std;
 
-struct Edge {
-    int src, dest;
-};
+typedef pair<int, int> iPair;
 
-class Grapher
+struct Grapher
 {
-public:
-    int V;
-    
-    vector<vector<int>> adj;
-    Grapher(vector<Edge> ed, int N){
-        adj.resize(N);
-        V = N;
-        for(auto &edge: ed){
-            adj[edge.src].push_back(edge.dest);
-        }
-    }
-    
-    void DFSUtil(int v, bool visited[]) 
-    { 
-        //Mark the current node as visited and print it 
-        visited[v] = true; 
-  
-        // Recur for all the vertices adjacent to this vertex 
-        vector<int>::iterator i; 
-        for (i = adj[v].begin(); i != adj[v].end(); ++i) 
-            if (!visited[*i]) 
-                DFSUtil(*i, visited); 
-    } 
-    
-    bool isConnected()
-    {
-        bool visited[V];
-        int i;
-        for (i = 0; i < V; i++)
-        {
-            visited[i] = false;
-        }
-        for (i = 0; i < V; i++)
-        {
-            if (adj[i].size() != 0)
-            {
-                break;
-            }
-        }
-        if (i == V)
-        {
-            return true;
-        }
-        DFSUtil(i, visited);
-        for (i = 0; i < V; i++)
-        {
-            if (visited[i] == false && adj[i].size() > 0)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    /* The function returns one of the following values 
-   0 --> If grpah is not Eulerian 
-   1 --> If graph has an Euler path (Semi-Eulerian) 
-   2 --> If graph has an Euler Circuit (Eulerian)  */
-    int isEulerian() 
-    { 
-    // Check if all non-zero degree vertices are connected 
-        //if (isConnected() == false) 
-        //    return 0; 
-  
-    // Count vertices with odd degree 
-        int odd = 0; 
-        for (int i = 0; i < V; i++) 
-            if (adj[i].size() & 1) 
-              odd++; 
-  
-    // If count is more than 2, then graph is not Eulerian 
-        if (odd > 2) 
-            return 0; 
-  
-    // If odd count is 2, then semi-eulerian. 
-    // If odd count is 0, then eulerian 
-    // Note that odd count can never be 1 for undirected graph 
-        return (odd)? 1 : 2; 
-    } 
-
-    int test() 
-    { 
-    int res = isEulerian(); 
-    if (res == 0){
-        cout << "graph is not Eulerian\n"; 
-        return 0;
-    }
-    else if (res == 1) {
-        cout << "graph has a Euler path\n"; 
-        return 1;
-    }
-    else{
-        cout << "graph has a Euler cycle\n"; 
-        return 2;
-    }  
+    int V, E;
+    vector< pair<int, iPair> > edges;
+    Grapher(int V, int E, vector< pair<int, iPair> > ed){
+        this->V = V;
+        this->E = E;
+        this->edges = ed;
     }
 };
+
+struct DisjointSets 
+    { 
+        int *parent, *rnk; 
+        int n; 
+  
+        // Constructor. 
+        DisjointSets(int n) 
+        { 
+            // Allocate memory 
+            this->n = n; 
+            parent = new int[n+1]; 
+            rnk = new int[n+1]; 
+            
+            // Initially, all vertices are in 
+            // different sets and have rank 0. 
+            for (int i = 0; i <= n; i++) 
+            { 
+                rnk[i] = 0; 
+                
+                //every element is parent of itself 
+                parent[i] = i; 
+            } 
+        } 
+        
+        // Find the parent of a node 'u' 
+        // Path Compression 
+        int find(int u) 
+        { 
+            /* Make the parent of the nodes in the path 
+               from u--> parent[u] point to parent[u] */
+            if (u != parent[u]) 
+                parent[u] = find(parent[u]); 
+            return parent[u]; 
+        } 
+        
+        // Union by rank 
+        void merge(int x, int y) 
+        { 
+            x = find(x), y = find(y); 
+            
+            /* Make tree with smaller height 
+            a subtree of the other tree  */
+            if (rnk[x] > rnk[y]) 
+                parent[y] = x; 
+            else // If rnk[x] <= rnk[y] 
+                parent[x] = y; 
+            
+            if (rnk[x] == rnk[y]) 
+                rnk[y]++; 
+        } 
+        
+
+    };
+
+
+
 
 int findIndex(vector<string> netlist, string u);
-vector<Edge> consEdge(vector<Transistor> stack, vector<string> netvector);
+vector< pair<int, iPair> > consEdge(vector<Transistor> stack, vector<Net> netvector);
 void printGraph(Grapher graph, int N);
 int detectDuality(vector<Transistor> transistors);
+vector< pair<int, int> > kruskalMST(vector< pair<int, iPair> > edges, int V);
 #endif /* GRAPHER_H */

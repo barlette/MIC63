@@ -19,6 +19,36 @@
 
 using namespace std;
 
+int find_index_pair(int u, vector< pair<int, int> > edges, int whichone){
+    for(int i; i < edges.size(); i++){
+        if(whichone == 1){
+            if(edges[i].first == u){
+                return i;
+            }
+        } else if(whichone ==2) {
+            if(edges[i].second == u){
+                return i;            
+            }
+        }
+    }
+    return 0;
+}
+
+int find_nonvis_pair(int u, vector< pair<int, int> > edges, vector <int> vis, int whichone){
+    for(int i; i < edges.size(); i++){
+        if(whichone == 1){
+            if((edges[i].first == u) && (vis[i] != 1)){
+                return i;
+            }
+        } else if(whichone ==2) {
+            if((edges[i].second == u) && (vis[i] != 1)){
+                return i;            
+            }
+        }
+    }
+    return 0;
+}
+
 void place(string fileName){
     vector<Transistor> nSt;
     vector<Transistor> pSt;
@@ -28,24 +58,33 @@ void place(string fileName){
     nSt = nStack(list_transistors); 
     pSt = pStack(list_transistors);
 
-    vector<string> netlist_n = indexNetlist(nSt);
-    vector<string> netlist_p = indexNetlist(pSt);
     
-    vector<Grapher> eulerGraphs;
     
-    for (auto i = netlist_p.begin(); i != netlist_p.end(); ++i)
-        std::cout << *i << ' ';
-    std::cout << "\n";
-    Grapher gp(consEdge(pSt, netlist_p), netlist_p.size());
-    printGraph(gp, netlist_p.size());
-    gp.test();
-            
-    for (auto i = netlist_n.begin(); i != netlist_n.end(); ++i)
-        std::cout << *i << ' ';
-    std::cout << "\n";
-    Grapher gn(consEdge(nSt, netlist_n), netlist_n.size());
-    printGraph(gn, netlist_n.size());
-    gn.test();
+    vector<Net> netlist_n = indexNetlist(nSt);
+    vector<Net> netlist_p = indexNetlist(pSt);
+//    
+//    vector<Grapher> eulerGraphs;
+//    
+    int count =0;
+    for (auto it = netlist_p.begin(); it != netlist_p.end(); it++){
+        std::cout << count << ": " << it->name << " " << it->type << " " << it->wTransistor << "\n";
+        count++;
+    }
+    
+    vector< pair<int, iPair> > edges = consEdge(pSt, netlist_p);
+    Grapher gp(netlist_p.size(), edges.size(), edges);
+    
+    for (auto it = edges.begin(); it != edges.end(); it++){
+        std::cout << it->first << it->second.first << it->second.second << "\n";
+    }
+    
+    cout << "Edges of MST are \n";
+    vector< pair <int, int> > mst_wt = kruskalMST(gp.edges, gp.V);
+    
+    for(int it = 0; it < mst_wt.size(); it++)
+        cout << mst_wt[it].first << " - " << mst_wt[it].second << "\n";
+    
+
         
     detectDuality(nSt, pSt);
     
@@ -63,7 +102,10 @@ void place(string fileName){
     }
     
     int maxFins = nFins + pFins + 4;
-    int grade[maxFins][maxTracks];
+    string grade[maxFins][(2*maxTracks)-1];
+    int totalTracks = (2*maxTracks)-1;
+    //vector< vector<int> > grade;
+    
     int estWidth = 54*maxTracks;
     int estHeight = 64 + 20*(maxFins-1) + 7*maxFins;
     int estArea = estWidth*estHeight;
@@ -71,6 +113,56 @@ void place(string fileName){
     cout << maxFins << " " << maxTracks << "\n";
     cout << "Estimated maximum width: " << estWidth << "n\nEstimated height: " << estHeight << "n\nEstimated maximum area:" << estArea << "n²\n";
     
+    string netName;
+    string lastName = "inv";
+    
+    int n_index = 0, last_index=0;
+    int edges_count =0;
+    vector <int> visited(mst_wt.size(), 0);
+    
+    for(int column = 2; column < totalTracks-2; column++){
+
+        if(edges_count < mst_wt.size()){
+            cout << n_index;
+            netName = netlist_p[mst_wt[n_index].first].name;  
+            visited[n_index] = 1;
+            last_index = n_index;
+            n_index = find_index_pair(mst_wt[n_index].second, mst_wt, 1); 
+//            if(visited[n_index] == 1){
+//                n_index = find_nonvis_pair(mst_wt[last_index].second, mst_wt, visited, 2);  
+//                cout << n_index;
+//            }
+        if(lastName != netName){
+            for(int row = 0; row < maxFins; row++){
+                grade[row][column] = netName;
+            } 
+        } else column--;
+        lastName = netName;
+        
+        cout << "Edge count: " << edges_count << "\n";
+        } else if (edges_count == mst_wt.size()){
+            cout << mst_wt[last_index].second;
+            cout << netlist_p[mst_wt[last_index].second].name;
+            netName = netlist_p[mst_wt[last_index].second].name;
+            if(lastName != netName){
+                for(int row = 0; row < maxFins; row++){
+                    grade[row][column] = netName;
+                } 
+            } else column--;              
+        }
+        edges_count++;
+    }
     
     
+    
+    
+    
+    
+    for(int row = 0; row < maxFins; row++){
+        for(int column = 2; column < totalTracks-2; column++){
+            cout << grade[row][column] << " ";
+        }
+        cout << "\n";
+    }
 }
+
