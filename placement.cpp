@@ -46,7 +46,7 @@ int find_nonvis_pair(int u, vector< pair<int, int> > edges, vector <int> vis, in
             }
         }
     }
-    return 0;
+    return -1;
 }
 
 void place(string fileName){
@@ -74,9 +74,9 @@ void place(string fileName){
     vector< pair<int, iPair> > edges = consEdge(pSt, netlist_p);
     Grapher gp(netlist_p.size(), edges.size(), edges);
     
-    for (auto it = edges.begin(); it != edges.end(); it++){
-        std::cout << it->first << it->second.first << it->second.second << "\n";
-    }
+    //for (auto it = edges.begin(); it != edges.end(); it++){
+    //    std::cout << it->first << it->second.first << it->second.second << "\n";
+    //}
     
     cout << "Edges of MST are \n";
     vector< pair <int, int> > mst_wt = kruskalMST(gp.edges, gp.V);
@@ -110,7 +110,7 @@ void place(string fileName){
     int estHeight = 64 + 20*(maxFins-1) + 7*maxFins;
     int estArea = estWidth*estHeight;
     
-    cout << maxFins << " " << maxTracks << "\n";
+    //cout << maxFins << " " << maxTracks << "\n";
     cout << "Estimated maximum width: " << estWidth << "n\nEstimated height: " << estHeight << "n\nEstimated maximum area:" << estArea << "n²\n";
     
     string netName;
@@ -123,26 +123,33 @@ void place(string fileName){
     for(int column = 2; column < totalTracks-2; column++){
 
         if(edges_count < mst_wt.size()){
-            cout << n_index;
-            netName = netlist_p[mst_wt[n_index].first].name;  
+            //cout << n_index;
+            netName = netlist_p[mst_wt[n_index].first].name; 
+            //cout << netName;
             visited[n_index] = 1;
             last_index = n_index;
-            n_index = find_index_pair(mst_wt[n_index].second, mst_wt, 1); 
-//            if(visited[n_index] == 1){
-//                n_index = find_nonvis_pair(mst_wt[last_index].second, mst_wt, visited, 2);  
-//                cout << n_index;
-//            }
+            n_index = find_nonvis_pair(mst_wt[n_index].second, mst_wt, visited, 1);
+            //cout << n_index;    
         if(lastName != netName){
             for(int row = 0; row < maxFins; row++){
                 grade[row][column] = netName;
             } 
         } else column--;
+
+        if(n_index == -1){
+            netName = netlist_p[mst_wt[last_index].second].name; 
+            if(lastName != netName){
+                column++;
+                for(int row = 0; row < maxFins; row++){
+                    grade[row][column] = netName;
+            } 
+            } else column--;
+        }        
         lastName = netName;
-        
-        cout << "Edge count: " << edges_count << "\n";
+        //cout << "Edge count: " << edges_count << "\n";
         } else if (edges_count == mst_wt.size()){
-            cout << mst_wt[last_index].second;
-            cout << netlist_p[mst_wt[last_index].second].name;
+            //cout << mst_wt[last_index].second;
+            //cout << netlist_p[mst_wt[last_index].second].name;
             netName = netlist_p[mst_wt[last_index].second].name;
             if(lastName != netName){
                 for(int row = 0; row < maxFins; row++){
