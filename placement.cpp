@@ -58,35 +58,7 @@ void place(string fileName){
     nSt = nStack(list_transistors); 
     pSt = pStack(list_transistors);
 
-    
-    
-    vector<Net> netlist_n = indexNetlist(nSt);
-    vector<Net> netlist_p = indexNetlist(pSt);
-//    
-//    vector<Grapher> eulerGraphs;
-//    
-    int count =0;
-    for (auto it = netlist_p.begin(); it != netlist_p.end(); it++){
-        std::cout << count << ": " << it->name << " " << it->type << " " << it->wTransistor << "\n";
-        count++;
-    }
-    
-    vector< pair<int, iPair> > edges = consEdge(pSt, netlist_p);
-    Grapher gp(netlist_p.size(), edges.size(), edges);
-    
-    //for (auto it = edges.begin(); it != edges.end(); it++){
-    //    std::cout << it->first << it->second.first << it->second.second << "\n";
-    //}
-    
-    cout << "Edges of MST are \n";
-    vector< pair <int, int> > mst_wt = kruskalMST(gp.edges, gp.V);
-    
-    for(int it = 0; it < mst_wt.size(); it++)
-        cout << mst_wt[it].first << " - " << mst_wt[it].second << "\n";
-    
-
-        
-    detectDuality(nSt, pSt);
+        detectDuality(nSt, pSt);
     
     int maxTracks = 3*(std::max(nSt.size(), pSt.size())); // gets highest number of transistors between N and P stacks;
     
@@ -113,63 +85,70 @@ void place(string fileName){
     //cout << maxFins << " " << maxTracks << "\n";
     cout << "Estimated maximum width: " << estWidth << "n\nEstimated height: " << estHeight << "n\nEstimated maximum area:" << estArea << "n²\n";
     
-    string netName;
-    string lastName = "inv";
     
-    int n_index = 0, last_index=0;
-    int edges_count =0;
-    vector <int> visited(mst_wt.size(), 0);
+    vector<Net> netlist_n = indexNetlist(nSt);
+    vector<Net> netlist_p = indexNetlist(pSt);
+//    
+//    vector<Grapher> eulerGraphs;
+//    
+    int count =0;
+    for (auto it = netlist_p.begin(); it != netlist_p.end(); it++){
+        std::cout << count << ": " << it->name << " " << it->type << " " << it->wTransistor << "\n";
+        count++;
+    }
     
-    for(int column = 2; column < totalTracks-2; column++){
-
-        if(edges_count < mst_wt.size()){
-            //cout << n_index;
-            netName = netlist_p[mst_wt[n_index].first].name; 
-            //cout << netName;
-            visited[n_index] = 1;
-            last_index = n_index;
-            n_index = find_nonvis_pair(mst_wt[n_index].second, mst_wt, visited, 1);
-            //cout << n_index;    
-        if(lastName != netName){
-            for(int row = 0; row < maxFins; row++){
-                grade[row][column] = netName;
-            } 
-        } else column--;
-
-        if(n_index == -1){
-            netName = netlist_p[mst_wt[last_index].second].name; 
-            if(lastName != netName){
-                column++;
-                for(int row = 0; row < maxFins; row++){
-                    grade[row][column] = netName;
-            } 
-            } else column--;
-        }        
-        lastName = netName;
-        //cout << "Edge count: " << edges_count << "\n";
-        } else if (edges_count == mst_wt.size()){
-            //cout << mst_wt[last_index].second;
-            //cout << netlist_p[mst_wt[last_index].second].name;
-            netName = netlist_p[mst_wt[last_index].second].name;
-            if(lastName != netName){
-                for(int row = 0; row < maxFins; row++){
-                    grade[row][column] = netName;
-                } 
-            } else column--;              
+    vector< pair<int, iPair> > edges = consEdge(pSt, netlist_p);
+    Grapher gp(netlist_p.size(), edges.size(), edges);
+    
+    //for (auto it = edges.begin(); it != edges.end(); it++){
+    //    std::cout << it->first << it->second.first << it->second.second << "\n";
+    //}
+    
+    cout << "Edges of MST are \n";
+    vector< pair <int, int> > mst_wt = kruskalMST(gp.edges, gp.V);
+    
+    for(int it = 0; it < mst_wt.size(); it++)
+        cout << mst_wt[it].first << " - " << mst_wt[it].second << "\n";
+    
+    
+    int adjMatrix[netlist_p.size()][netlist_p.size()] = {};
+    
+    //monta matriz de adjacencia
+    for(int row = 0; row < netlist_p.size(); row++){
+        for(int column = 0; column < netlist_p.size(); column++){
+            if(row == column)
+                adjMatrix[row][column]=1;
+            }
         }
-        edges_count++;
+    
+    
+    for(int it = 0; it < mst_wt.size(); it++){
+        adjMatrix[mst_wt[it].first][mst_wt[it].second] = 1;
     }
     
     
-    
-    
-    
-    
-    for(int row = 0; row < maxFins; row++){
-        for(int column = 2; column < totalTracks-2; column++){
-            cout << grade[row][column] << " ";
-        }
+    // imprime matriz adjacencia
+    for(int row = 0; row < netlist_p.size(); row++){
+        for(int column = 0; column < netlist_p.size(); column++){
+            cout << adjMatrix[row][column] << " ";
+            }
         cout << "\n";
-    }
+        }
+    
+    vector <int> pos[netlist_p.size()];
+    
+    for(int row = 0; row < netlist_p.size(); row++){
+        for(int column = 0; column < netlist_p.size(); column++){
+            
+            }
+        cout << "\n";
+        }   
+    
 }
+    
+    
+    
+    
+
+
 
