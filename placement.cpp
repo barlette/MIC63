@@ -92,6 +92,16 @@ int find_nonvis_node(vector < vector<int> > adj, int n, vector <int> visited){
     return -1;
 }
 
+int find_samename_net(vector <int> pos, vector <Net> netlist, int net){
+    for(int it = 0; it < pos.size(); it++){
+        if(netlist[pos[it]].name == netlist[net].name){
+            //cout << netlist[net].name;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void place(string fileName){
     vector<Transistor> nSt;
     vector<Transistor> pSt;
@@ -184,51 +194,82 @@ void place(string fileName){
     
     vector <int> pos(netlist_p.size(), -1);
     vector <int> visited(netlist_p.size());
-
+    vector <int> queue;
     
-    int it=0;
+    int it=0, initial_it=0;
     
-    while(it < netlist_p.size()){
-    int vert = find_leaf(adjMatrix, netlist_p.size(), visited);
-    if(vert != -1){
-        pos[it] = vert;
-        cout << vert;
-        visited[pos[it]] = 1;            
-    } else cout << "Não achou vértice folha restante.\n";
-    vert = 0;
-    it++;
-    while(vert != -1){
-        
-        vert =  find_connected_vertice(adjMatrix, pos[it-1], visited);
+    while(it < netlist_p.size()){   
+        initial_it = it;
+        //cout << "initial: " << initial_it << "**\n";
+        int vert = find_leaf(adjMatrix, netlist_p.size(), visited);
         if(vert != -1){
+            queue.push_back(vert);
             pos[it] = vert;
-            cout << pos[it];
-            it++;
-            visited[vert] =1;
-        }
-    }
-    //cout << pos[it-1];
-    vert=0;
-    if(count_vertex_degree(adjMatrix, netlist_p.size(), pos[it-1]) > 1){
-        vert = find_nonvis_node(adjMatrix, pos[it-1], visited);
-        pos[it] = vert;
-        cout << vert;
+            //cout << vert;
+            visited[pos[it]] = 1;            
+        } else cout << "Não achou vértice folha restante.\n";
+        vert = 0;
         it++;
-        visited[vert]=1;
-    }
-    
-    while(vert != -1){    
+        while(vert != -1){
+            
+            vert =  find_connected_vertice(adjMatrix, pos[it-1], visited);
+            if(vert != -1){
+                queue.push_back(vert);
+                pos[it] = vert;
+                //cout << pos[it];
+                it++;
+                visited[vert] =1;
+            }
+        }
+        
+        if(count_vertex_degree(adjMatrix, netlist_p.size(), pos[it-1]) % 2 != 0){
+            //cout << "node with odd degree\n";
+            //initial_it;
+            //cout << netlist_p[pos[initial_it]].name <<  "==" << netlist_p[queue[2]].name ;
+            //cout << netlist_p[pos[initial_it]].name << "!=" <<  netlist_p[queue[0]].name;
+            if((netlist_p[pos[initial_it]].name == netlist_p[queue[2]].name))
+            {
+                //cout << "teste1";
+                //it = initial_it;
+                for(int rev = queue.size()-1; rev >=0; rev--){
+                    pos[it] = queue[rev];
+                    it++;
+                }
+            } 
+            else if(find_samename_net(pos, netlist_p, queue[2]) && (netlist_p[pos[initial_it-1]].name != netlist_p[queue[0]].name)){
+                //cout << "teste2";
+                it = initial_it;
+                for(int rev = queue.size()-1; rev >=0; rev--){
+                    pos[it] = queue[rev];
+                    it++;
+                }                
+            }
+        }
+        queue.erase(queue.begin(), queue.end());
         //cout << pos[it-1];
-        vert =  find_connected_vertice_toleaf(adjMatrix, pos[it-1], visited);
-        if(vert != -1){
+        vert=0;
+        if(count_vertex_degree(adjMatrix, netlist_p.size(), pos[it-1]) > 1){
+            vert = find_nonvis_node(adjMatrix, pos[it-1], visited);
             pos[it] = vert;
-            cout << pos[it];
+            //cout << vert;
             it++;
-            visited[vert] =1;
+            visited[vert]=1;
+        }
+        
+        while(vert != -1){    
+            //cout << pos[it-1];
+            vert =  find_connected_vertice_toleaf(adjMatrix, pos[it-1], visited);
+            if(vert != -1){
+                pos[it] = vert;
+                //cout << pos[it];
+                it++;
+                visited[vert] =1;
+            }
         }
     }
-    }
     
+    
+    //Imprime a grade de posicionamento
     string grade[maxFins][(2*maxTracks)-1];
     cout << "\n";
     string lastName = " ";
