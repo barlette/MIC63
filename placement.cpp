@@ -102,6 +102,67 @@ int find_samename_net(vector <int> pos, vector <Net> netlist, int net){
     return 0;
 }
 
+void construct_net_matrix(vector<Transistor> trans){
+    vector <string> inputs, pins_and_nets;
+
+    for(int it=0; it<trans.size(); it++){
+        inputs.push_back(trans[it].get_gate());
+        if(find(pins_and_nets.begin(), pins_and_nets.end(), trans[it].get_drain()) == pins_and_nets.end()){
+            pins_and_nets.push_back(trans[it].get_drain());
+        }
+        if(find(pins_and_nets.begin(), pins_and_nets.end(), trans[it].get_source()) == pins_and_nets.end()){
+            pins_and_nets.push_back(trans[it].get_source());
+        }
+    }
+    
+    vector <int> v(pins_and_nets.size(), 0);
+    vector < vector<int> > net_matrix(inputs.size(), v);
+    
+    for(int it=0; it<trans.size(); it++){
+        int input_index =   distance(inputs.begin(), find(inputs.begin(), inputs.end(), trans[it].get_gate()));
+        int drain_index =   distance(pins_and_nets.begin(), find(pins_and_nets.begin(), pins_and_nets.end(), trans[it].get_drain()));
+        int source_index =  distance(pins_and_nets.begin(), find(pins_and_nets.begin(), pins_and_nets.end(), trans[it].get_source()));
+        //cout << input_index << "\n";
+        //cout << drain_index << "\n";
+        //cout << source_index << "\n";
+        //std::distance(input_index, inputs.size());
+        net_matrix[input_index][drain_index] = 1;
+        net_matrix[input_index][source_index] = 1;
+    }
+    
+    vector <int> visited(inputs.size(), 0);
+    int parallel_count=1;
+    
+    for(int row1=0; row1 < net_matrix.size(); row1++){
+        visited[row1]=1;
+        
+        for(int row2=0; row2 < net_matrix.size(); row2++){
+            if((visited[row2] == 0) && (net_matrix[row1] == net_matrix[row2])){
+                visited[row2]=1;
+                cout << inputs[row1];
+                cout << inputs[row2];
+                parallel_count++;
+            }
+        }
+    }
+    cout << "Elementos em paralelo: " << parallel_count << "\n";
+    
+    for(int row=0; row < net_matrix.size(); row++){
+        for(int column=0; column < net_matrix[row].size(); column++){
+            cout << net_matrix[row][column] << " ";
+        }
+        cout << "\n";
+    }
+    
+    for(int it=0; it<inputs.size(); it++)
+        cout << inputs[it] << " ";
+    cout << "\n";
+    for(int it=0; it<pins_and_nets.size(); it++)
+        cout << pins_and_nets[it] << " ";
+    cout << "\n";
+    
+}
+
 void place(string fileName){
     vector<Transistor> nSt;
     vector<Transistor> pSt;
@@ -293,6 +354,7 @@ void place(string fileName){
         cout << "\n";
     }
 
+    construct_net_matrix(pSt);
 }
     
     
