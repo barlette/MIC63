@@ -24,8 +24,8 @@ vector<Transistor> nStack(vector<Transistor> ts)
         if(it->get_type() == 'N') n.push_back(Transistor(it->get_drain(), it->get_gate(), it->get_source(), it->get_bgate(), it->get_type(), it->get_width(), it->get_length(), it->get_nfin()));
     }
     
-    cout << "stack N: \n";
-    print_list(n);
+//    cout << "stack N: \n";
+//    print_list(n);
     
     return n;
 }
@@ -38,8 +38,8 @@ vector<Transistor> pStack(vector<Transistor> ts)
         if(it->get_type() == 'P') p.push_back(Transistor(it->get_drain(), it->get_gate(), it->get_source(), it->get_bgate(), it->get_type(), it->get_width(), it->get_length(), it->get_nfin()));
     }
     
-    cout << "stack P: \n";
-    print_list(p);
+//    cout << "stack P: \n";
+//    print_list(p);
     
     return p;
 }
@@ -78,7 +78,7 @@ int detectDuality(vector<Transistor> ns, vector<Transistor> ps){
     
     // if dual = 1 there are the number of p transistors and n transistors are the same;
     if(ps.size() == ns.size()){
-        cout << "Same number of P and N transistors \n";
+        //cout << "Same number of P and N transistors \n";
         dual = 1;
     }
     for(auto it = ns.begin(); it != ns.end(); it++){
@@ -89,7 +89,7 @@ int detectDuality(vector<Transistor> ns, vector<Transistor> ps){
     }
     
     if(pgates == ngates){
-        cout << "Same gate signals for P and N stacks\n";
+        //cout << "Same gate signals for P and N stacks\n";
         dual = 2;
     }
     return dual;

@@ -109,6 +109,6 @@ vector<Transistor> parser(string fileName)
         } catch (const char *msg){
         cerr << msg << endl; }
     }       
-    print_list(list_transistors);
+    //print_list(list_transistors);
     return list_transistors;
 }

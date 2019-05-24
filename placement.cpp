@@ -16,7 +16,7 @@
 #include <iterator>
 #include "grapher.h"
 #include "stack.h"
-
+#include <unistd.h>
 using namespace std;
 
 int find_index_pair(int u, vector< pair<int, int> > edges, int whichone){
@@ -163,65 +163,48 @@ void construct_net_matrix(vector<Transistor> trans){
     
 }
 
-void place(string fileName){
-    vector<Transistor> nSt;
-    vector<Transistor> pSt;
-    
-    vector<Transistor> list_transistors(parser(fileName));
-    
-    nSt = nStack(list_transistors); 
-    pSt = pStack(list_transistors);
+int print_layout(vector<int> pos, vector<Net> netlist_p, int maxFins, int maxTracks){
+    string grade[maxFins][(2*maxTracks)-1];
+    cout << "\n";
+    Net lastName;
+    int trackIndex = 0;
+    for(int it = 0; it < pos.size(); it++){
+        //cout << it;
+        //cout << lastName << netlist_p[it].name;
+        if((lastName.name != netlist_p[pos[it]].name) && (netlist_p[pos[it]].type == lastName.type)){
+            
+            for(int row=0; row<maxFins; row++){
+                grade[row][trackIndex] = "GATE";
+                grade[row][trackIndex+1] = "BREAK";
+                grade[row][trackIndex+2] = "GATE";
+                grade[row][trackIndex+3] = netlist_p[pos[it]].name;    
+            }
+            trackIndex = trackIndex+4;
+            lastName = netlist_p[pos[it]];        
+        } else if ((lastName.name != netlist_p[pos[it]].name)){
+                for(int row=0; row<maxFins; row++){
+                    grade[row][trackIndex] = netlist_p[pos[it]].name;    
+                }
+                trackIndex++;
+                lastName = netlist_p[pos[it]]; 
+        }
+    }
 
-        detectDuality(nSt, pSt);
-    
-    int maxTracks = 3*(std::max(nSt.size(), pSt.size())); // gets highest number of transistors between N and P stacks;
-    
-    int nFins=0, pFins=0;
-    
-    for(auto it = nSt.begin(); it != nSt.end(); it++){
-        if(it->get_nfin() > nFins)
-            nFins = it->get_nfin();
+    for(int row = 0; row < maxFins; row++){
+        for(int column = 0; column < trackIndex; column++){
+            cout << grade[row][column] << " ";
+        }
+        cout << "\n";
     }
-    for(auto it = pSt.begin(); it != pSt.end(); it++){
-        if(it->get_nfin() > pFins)
-            pFins = it->get_nfin();
-    }
-    
-    int maxFins = nFins + pFins + 4;
-    int totalTracks = (2*maxTracks)-1;
+    return trackIndex;
+}
 
-    
-    int estWidth = 54*maxTracks;
-    int estHeight = 64 + 20*(maxFins-1) + 7*maxFins;
-    int estArea = estWidth*estHeight;
-    
-    //cout << maxFins << " " << maxTracks << "\n";
-    cout << "Estimated maximum width: " << estWidth << "n\nEstimated height: " << estHeight << "n\nEstimated maximum area:" << estArea << "n²\n";
-    
-    
-    vector<Net> netlist_n = indexNetlist(nSt);
-    vector<Net> netlist_p = indexNetlist(pSt);
-//    
-//    vector<Grapher> eulerGraphs;
-//    
-    int count =0;
-    for (auto it = netlist_p.begin(); it != netlist_p.end(); it++){
-        std::cout << count << ": " << it->name << " " << it->type << " " << it->wTransistor << "\n";
-        count++;
-    }
-    
-    vector< pair<int, iPair> > edges = consEdge(pSt, netlist_p);
-    Grapher gp(netlist_p.size(), edges.size(), edges);
-    
-    //for (auto it = edges.begin(); it != edges.end(); it++){
-    //    std::cout << it->first << it->second.first << it->second.second << "\n";
-    //}
-    
-    cout << "Edges of MST are \n";
+vector<int> fstackPlacement(Grapher gp, vector<Net> netlist_p, int maxTracks, int maxFins){
+        //cout << "Edges of MST are \n";
     vector< pair <int, int> > mst_wt = kruskalMST(gp.edges, gp.V);
     
-    for(int it = 0; it < mst_wt.size(); it++)
-        cout << mst_wt[it].first << " - " << mst_wt[it].second << "\n";
+    //for(int it = 0; it < mst_wt.size(); it++)
+    //    cout << mst_wt[it].first << " - " << mst_wt[it].second << "\n";
     
     vector <int> v(netlist_p.size(), 0);
     vector < vector<int> > adjMatrix(netlist_p.size(), v);
@@ -246,12 +229,12 @@ void place(string fileName){
     
     
     // imprime matriz adjacencia
-    for(int row = 0; row < netlist_p.size(); row++){
-        for(int column = 0; column < netlist_p.size(); column++){
-            cout << adjMatrix[row][column] << " ";
-            }
-        cout << "\n";
-        }
+//    for(int row = 0; row < netlist_p.size(); row++){
+//        for(int column = 0; column < netlist_p.size(); column++){
+//            cout << adjMatrix[row][column] << " ";
+//            }
+//        cout << "\n";
+//        }
     
     vector <int> pos(netlist_p.size(), -1);
     vector <int> visited(netlist_p.size());
@@ -328,33 +311,172 @@ void place(string fileName){
             }
         }
     }
+    return pos;
+}
+
+vector <int> sstackPlacement(vector <int> fpos, vector<Net> fnetlist, vector <Net> snetlist, int maxFins, int maxTracks){
+    Net last_net;
+    vector <int> visited(snetlist.size()), spos(snetlist.size());
+    int pos_index=1;
+    int selected_gate;
     
+
     
-    //Imprime a grade de posicionamento
-    string grade[maxFins][(2*maxTracks)-1];
-    cout << "\n";
-    string lastName = " ";
-    int trackIndex = 0;
-    for(int it = 0; it < pos.size(); it++){
-        //cout << it;
-        //cout << lastName << netlist_p[it].name;
-        if(lastName != netlist_p[pos[it]].name){
-            for(int row=0; row<maxFins; row++){
-                grade[row][trackIndex] = netlist_p[pos[it]].name;    
+    for(int it=1; it<fpos.size(); it++){
+        if(fnetlist[fpos[it]].type == GATE){
+            for(int it2=1; it2<snetlist.size(); it2++){
+                if((snetlist[it2].name == fnetlist[fpos[it]].name) && (snetlist[it2].type == GATE) && (visited[it2] != 1)){
+//                    cout << snetlist[it2-1].name;
+//                    cout << snetlist[it2].name;
+//                    cout << snetlist[it2+1].name;
+                    visited[it2+1] = 1;
+                    visited[it2] = 1;
+                    visited[it2-1] = 1;
+                    selected_gate = it2;
+                    spos[pos_index-1] = selected_gate-1;
+                    spos[pos_index] = selected_gate;
+                    spos[pos_index+1] = selected_gate+1;
+                    pos_index = pos_index+3;
+                }
             }
-            trackIndex++;
-            lastName = netlist_p[pos[it]].name;        
         }
     }
-
-    for(int row = 0; row < maxFins; row++){
-        for(int column = 0; column < trackIndex; column++){
-            cout << grade[row][column] << " ";
+//    cout << "\n";
+//    for(int it=0; it<spos.size(); it++){
+//        cout << snetlist[spos[it]].name << " ";        
+//    }
+    
+    int index=0;
+    if((snetlist[spos[index]].name == snetlist[spos[index+3]].name) && (snetlist[spos[index]].type == ACTIVE) && (snetlist[spos[index+3]].type == ACTIVE)){
+            spos[index] = spos[index+2];
+            spos[index+2] = spos[index+3];
         }
-        cout << "\n";
+    
+    for(int it=5; it<spos.size()-3; it++){
+        if((snetlist[spos[it]].name == snetlist[spos[it+3]].name) && (snetlist[spos[it]].type == ACTIVE) && (snetlist[spos[it+3]].type == ACTIVE)){
+            spos[it+3] = spos[it+1]; 
+            spos[it+1] = spos[it];
+            //it = it+3;
+        }
     }
+    cout << "\n";
+    for(int it=0; it<spos.size(); it++){
+        cout << snetlist[spos[it]].name << " ";        
+    }
+    return spos;
+} 
 
-    construct_net_matrix(pSt);
+int max(int i, int v){
+    if(i < v){
+        return v;
+    } else return i;
+}
+
+vector <int> optimizing_spos(vector <int> pos, vector<Net> netlist){
+    for(int it=0; it<pos.size()-3;it++){
+        if((netlist[pos[it]].name != "VDD") && (netlist[pos[it]].name != "GND") && (netlist[pos[it]].type != GATE)){
+            if(netlist[pos[it]].name != netlist[pos[it+1]].name){
+                for(int it2=it+3; it2<pos.size();it2++){
+                    if((netlist[pos[it]].name == netlist[pos[it2]].name) && (netlist[pos[it2-1]].type == GATE) && (netlist[pos[it2-2]].name != netlist[pos[it2-3]].name)){
+                        int temp = pos[it2-2];
+                        pos[it2-2] = pos[it2];
+                        pos[it2] = temp;
+                    }
+                }            
+            }
+        }
+    }
+    
+//    for(int it=0; it<pos.size(); it++)
+//        cout << netlist[pos[it]].name << " ";
+//    return pos;
+}
+
+void place(string fileName){
+    vector<Transistor> nSt;
+    vector<Transistor> pSt;
+    
+    vector<Transistor> list_transistors(parser(fileName));
+    
+    nSt = nStack(list_transistors); 
+    pSt = pStack(list_transistors);
+
+        detectDuality(nSt, pSt);
+    
+    int maxTracks = 3*(std::max(nSt.size(), pSt.size())); // gets highest number of transistors between N and P stacks;
+    
+    int nFins=0, pFins=0;
+    
+    for(auto it = nSt.begin(); it != nSt.end(); it++){
+        if(it->get_nfin() > nFins)
+            nFins = it->get_nfin();
+    }
+    for(auto it = pSt.begin(); it != pSt.end(); it++){
+        if(it->get_nfin() > pFins)
+            pFins = it->get_nfin();
+    }
+    
+    int maxFins = nFins + pFins + 4;
+    int totalTracks = (2*maxTracks)-1;
+
+    
+    int estWidth = 54*maxTracks;
+    int estHeight = 64 + 20*(maxFins-1) + 7*maxFins;
+    int estArea = estWidth*estHeight;
+    
+    //cout << maxFins << " " << maxTracks << "\n";
+    //cout << "Estimated maximum width: " << estWidth << "n\nEstimated height: " << estHeight << "n\nEstimated maximum area:" << estArea << "n²\n";
+    
+    
+    vector<Net> netlist_n = indexNetlist(nSt);
+    vector<Net> netlist_p = indexNetlist(pSt);
+    
+    vector<Grapher> eulerGraphs;
+
+    cout << "NETLIST P\n";
+    int count =0;
+    for (auto it = netlist_p.begin(); it != netlist_p.end(); it++){
+        std::cout << count << ": " << it->name << " " << it->type << " " << it->wTransistor << "\n";
+        count++;
+    }
+    
+    cout << "NETLIST N\n";
+    count =0;
+    for (auto it = netlist_n.begin(); it != netlist_n.end(); it++){
+        std::cout << count << ": " << it->name << " " << it->type << " " << it->wTransistor << "\n";
+        count++;
+    }
+    
+    vector< pair<int, iPair> > edges_p = consEdge(pSt, netlist_p);
+    Grapher gp(netlist_p.size(), edges_p.size(), edges_p);
+   
+        vector< pair<int, iPair> > edges_n = consEdge(nSt, netlist_n);
+    Grapher gn(netlist_n.size(), edges_n.size(), edges_n);
+    
+    vector<int> fp_pos, fn_pos, sp_pos, sn_pos;
+    int fp_pos_tracks, fn_pos_tracks, sp_pos_tracks, sn_pos_tracks;
+    
+    fp_pos = fstackPlacement(gp, netlist_p, maxTracks, maxFins);
+    sn_pos = sstackPlacement(fp_pos, netlist_p, netlist_n, maxFins, maxTracks);
+    fp_pos_tracks = print_layout(fp_pos, netlist_p, maxFins, maxTracks);    
+    sn_pos_tracks = print_layout(sn_pos, netlist_n, maxFins, maxTracks);
+    sn_pos = optimizing_spos(sn_pos, netlist_n);
+//    sn_pos_tracks = print_layout(sn_pos, netlist_n, maxFins, maxTracks);
+//    int fp_max = max(fp_pos_tracks, sn_pos_tracks);
+//    cout << "\n\n";
+     
+//    fn_pos = fstackPlacement(gn, netlist_n, maxTracks, maxFins);
+//    sp_pos = sstackPlacement(fn_pos, netlist_n, netlist_p, maxFins, maxTracks);
+//    fn_pos_tracks = print_layout(fn_pos, netlist_n, maxFins, maxTracks);
+//    sp_pos_tracks = print_layout(sp_pos, netlist_p, maxFins, maxTracks);  
+//    sp_pos = optimizing_spos(sp_pos, netlist_p);
+//    sp_pos_tracks = print_layout(sp_pos, netlist_p, maxFins, maxTracks);  
+//    int fn_max = max(fn_pos_tracks, sp_pos_tracks);
+//    
+//    if(fp_max > fn_max)
+//        cout << "Segunda opção";
+//    else cout << "Primeira opção";
+
 }
     
     
