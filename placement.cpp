@@ -163,7 +163,7 @@ void construct_net_matrix(vector<Transistor> trans){
     
 }
 
-int print_layout(vector<int> pos, vector<Net> netlist_p, int maxFins, int maxTracks){
+int print_layout(vector<int> pos, vector<Net> netlist_p, int maxFins, int maxTracks, int output){
     string grade[maxFins][(2*maxTracks)-1];
     cout << "\n";
     Net lastName;
@@ -189,13 +189,15 @@ int print_layout(vector<int> pos, vector<Net> netlist_p, int maxFins, int maxTra
                 lastName = netlist_p[pos[it]]; 
         }
     }
-
-    for(int row = 0; row < maxFins; row++){
-        for(int column = 0; column < trackIndex; column++){
-            cout << grade[row][column] << " ";
+    if(output){
+        for(int row = 0; row < maxFins; row++){
+            for(int column = 0; column < trackIndex; column++){
+                cout << grade[row][column] << " ";
+            }
+            cout << "\n";
         }
-        cout << "\n";
     }
+    
     return trackIndex;
 }
 
@@ -359,10 +361,10 @@ vector <int> sstackPlacement(vector <int> fpos, vector<Net> fnetlist, vector <Ne
             //it = it+3;
         }
     }
-    cout << "\n";
-    for(int it=0; it<spos.size(); it++){
-        cout << snetlist[spos[it]].name << " ";        
-    }
+//    cout << "\n";
+//    for(int it=0; it<spos.size(); it++){
+//        cout << snetlist[spos[it]].name << " ";        
+//    }
     return spos;
 } 
 
@@ -381,7 +383,7 @@ vector <int> optimizing_sposI(vector <int> pos, vector<Net> netlist){
             if(netlist[pos[it]].name != netlist[pos[it+1]].name){
                 for(int it2=it+3; it2<pos.size();it2++){
                     if((netlist[pos[it]].name == netlist[pos[it2]].name) && (netlist[pos[it2-1]].type == GATE) && (netlist[pos[it2-2]].name != netlist[pos[it2-3]].name)){
-                        cout << "teste" << netlist[pos[it]].name << "\n";
+                        //cout << "teste" << netlist[pos[it]].name << "\n";
                         int temp = pos[it2-2];
                         pos[it2-2] = pos[it2];
                         pos[it2] = temp;
@@ -400,29 +402,58 @@ pair< vector <int>, vector <int> > optimizing_sposII(vector <int> spos, vector<N
     int break_det =0;
 
     for(int it=0; it<spos.size();it++){
-        if((snetlist[spos[it]].name != "VDD") && (snetlist[spos[it]].name != "GND")){
+        if((snetlist[spos[it]].name != "VDD") && (snetlist[spos[it]].name != "GND") && (snetlist[spos[it]].type == ACTIVE) && (snetlist[spos[it]].name != snetlist[spos[it+1]].name)){
             first_net = it;
             for(int it2=it; it2<spos.size();it2++){
-                if((snetlist[spos[it2]].name != snetlist[spos[it2+1]].name) && (snetlist[spos[it2]].type == ACTIVE) && (snetlist[spos[it2+1]].type == ACTIVE)){
-                    if(((it2 - first_net) > 2)){
+                if((snetlist[spos[it2]].name != snetlist[spos[it2+1]].name) && (snetlist[spos[it2]].type == ACTIVE) && (snetlist[spos[it2+1]].type == ACTIVE) && ((snetlist[spos[it2]].name == "GND") || (snetlist[spos[it2]].name == "VDD")) && ((it2 - first_net) > 2)){
                     break_det = it2;
-                    cout<< snetlist[spos[it2]].name << " ";
+                    //cout<< snetlist[spos[it2]].name << " ";
                     reverse(spos.begin()+it, spos.begin()+it2+1);
                     reverse(fpos.begin()+it, fpos.begin()+it2+1);
                     it = it2+1;
                     it2 = spos.size();
-                    } else {
+                    } else if((snetlist[spos[it2]].name != snetlist[spos[it2+1]].name) && (snetlist[spos[it2]].type == ACTIVE) && (snetlist[spos[it2+1]].type == ACTIVE) && (snetlist[spos[it2]].name != "GND") && (snetlist[spos[it2]].name != "VDD")){
                         it=it2+1; it2 = spos.size();
-                    } 
+                    }
                 }
             }
         }
+    
+    int it=0;
+    
+    while(it < spos.size()-1){
+        if((snetlist[spos[it]].type == ACTIVE) && (snetlist[spos[it+1]].type == ACTIVE) && (snetlist[spos[it]].name != snetlist[spos[it+1]].name)){
+            cout << snetlist[spos[it]].name;
+            for(int it2=it+1; it2<spos.size();it2++){
+                if((snetlist[spos[it2]].name == snetlist[spos[it]].name) && (snetlist[spos[it2]].name != snetlist[spos[it2-1]].name) && (snetlist[spos[it2]].type == snetlist[spos[it2-1]].type)){
+                    //cout << snetlist[spos[it2]].name;
+                    //cout << snetlist[spos[it2+1]].name << " " << snetlist[spos[it2+2]].name << "\n";                    
+                    spos.insert(spos.begin()+it+1, spos.begin()+it2, spos.begin()+it2+3);
+                    spos.erase(spos.begin()+it2+3, spos.begin()+it2+6);
+                    fpos.insert(fpos.begin()+it+1, fpos.begin()+it2, fpos.begin()+it2+3);
+                    fpos.erase(fpos.begin()+it2+3, fpos.begin()+it2+6);
+
+                    it = it+3;
+                    it2 = spos.size();
+                }
+            }
+        }
+        it++;
     }
+    
     
     pair < vector <int>, vector <int> > result;
     result.first = spos;
     result.second = fpos;
     return result;
+}
+
+void generate_layout(vector <int> n_pos, vector <int> p_pos, vector<Net> netlist_p, vector<Net> netlist_n, int nFins, int pFins){
+    //string grade[maxFins][(2*maxTracks)-1];
+    
+    for(int it=0; it<n_pos.size(); it++){
+        
+    }
 }
 
 void place(string fileName){
@@ -449,6 +480,8 @@ void place(string fileName){
             pFins = it->get_nfin();
     }
     
+    nFins = nFins+2;
+    pFins = pFins+2;
     int maxFins = nFins + pFins + 4;
     int totalTracks = (2*maxTracks)-1;
 
@@ -488,49 +521,101 @@ void place(string fileName){
     
     vector<int> fp_pos, fn_pos, sp_pos, sn_pos;
     int fp_pos_tracks, fn_pos_tracks, sp_pos_tracks, sn_pos_tracks;
-    vector<int> n_temp, p_temp;
-    
+    vector<int> sn_temp, fp_temp;
+    int n_temp_tracks, p_temp_tracks, max_temp;
+    pair < vector <int>, vector <int> > opt;    
     fp_pos = fstackPlacement(gp, netlist_p, maxTracks, maxFins);
     sn_pos = sstackPlacement(fp_pos, netlist_p, netlist_n, maxFins, maxTracks);
-    fp_pos_tracks = print_layout(fp_pos, netlist_p, maxFins, maxTracks);    
-    //sn_pos_tracks = print_layout(sn_pos, netlist_n, maxFins, maxTracks);
+    fp_pos_tracks = print_layout(fp_pos, netlist_p, pFins, maxTracks, 1);    
+    sn_pos_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 1);
     sn_pos = optimizing_sposI(sn_pos, netlist_n);
-    //sn_pos_tracks = print_layout(sn_pos, netlist_n, maxFins, maxTracks);
-    int fp_max = max(fp_pos_tracks, sn_pos_tracks);
+    sn_pos_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 1);
+    int fp_max = max(fp_pos_tracks, sn_pos_tracks);    
+
+    opt = optimizing_sposII(sn_pos, netlist_n, fp_pos, netlist_p);
+    sn_temp = opt.first;
+    fp_temp = opt.second;
+  
+  
     
-    
-    pair < vector <int>, vector <int> > opt = optimizing_sposII(sn_pos, netlist_n, fp_pos, netlist_p);
-    n_temp = opt.first;
-    p_temp = opt.second;  
-    int n_temp_tracks, p_temp_tracks, max_temp;
-    
-    p_temp_tracks = print_layout(p_temp, netlist_p, maxFins, maxTracks);    
-    //n_temp_tracks = print_layout(n_temp, netlist_n, maxFins, maxTracks);
+ 
+    p_temp_tracks = print_layout(fp_temp, netlist_p, pFins, maxTracks, 1);    
+    n_temp_tracks = print_layout(sn_temp, netlist_n, nFins, maxTracks, 1);
     max_temp = max(p_temp_tracks, n_temp_tracks);
     
-    vector<int> p_temp2;
+    vector<int> fp_temp2, last;
+    
+    fp_temp2 = fp_temp;
     
     if (max_temp <= fp_max){
-        do {   
-        p_temp2 = optimizing_sposI(p_temp, netlist_p);
-        p_temp = p_temp2;
-        } while(p_temp2 != p_temp);
+        do {
+            fp_temp = fp_temp2;
+            fp_temp2 = optimizing_sposI(fp_temp2, netlist_p);
+        } while(fp_temp2 != fp_temp);
     }
+  
+    fp_pos = fp_temp2;
+    sn_pos = sn_temp;
+    p_temp_tracks = print_layout(fp_pos, netlist_p, pFins, maxTracks, 1);
+    n_temp_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 1);
     
-    p_temp_tracks = print_layout(p_temp2, netlist_p, maxFins, maxTracks);
-    //cout << "\n\n";
+    int fp_total;
+    fp_max = max(p_temp_tracks, n_temp_tracks);
+    fp_total = p_temp_tracks + n_temp_tracks;
+    //cout << fp_max;
+    
+    
+    cout << "\n\n";
+    
      
-//    fn_pos = fstackPlacement(gn, netlist_n, maxTracks, maxFins);
-//    sp_pos = sstackPlacement(fn_pos, netlist_n, netlist_p, maxFins, maxTracks);
-//    fn_pos_tracks = print_layout(fn_pos, netlist_n, maxFins, maxTracks);
-//    sp_pos_tracks = print_layout(sp_pos, netlist_p, maxFins, maxTracks);  
-//    sp_pos = optimizing_spos(sp_pos, netlist_p);
-//    sp_pos_tracks = print_layout(sp_pos, netlist_p, maxFins, maxTracks);  
-//    int fn_max = max(fn_pos_tracks, sp_pos_tracks);
+    fn_pos = fstackPlacement(gn, netlist_n, maxTracks, maxFins);
+    sp_pos = sstackPlacement(fn_pos, netlist_n, netlist_p, maxFins, maxTracks);
+    //cout << "\nPSTACK\n";
+    sp_pos_tracks = print_layout(sp_pos, netlist_p, pFins, maxTracks, 0); 
+    //cout << "\nNSTACK\n";
+    fn_pos_tracks = print_layout(fn_pos, netlist_n, nFins, maxTracks, 0);
+ 
+    sp_pos = optimizing_sposI(sp_pos, netlist_p);
+    sp_pos_tracks = print_layout(sp_pos, netlist_p, pFins, maxTracks, 0);  
+    int fn_max = max(fn_pos_tracks, sp_pos_tracks);
+   
+    vector<int> fn_temp, sp_temp;
+    opt = optimizing_sposII(sp_pos, netlist_p, fn_pos, netlist_n);
+    sp_temp = opt.first;
+    fn_temp = opt.second;    
+// 
+    p_temp_tracks = print_layout(sp_temp, netlist_p, pFins, maxTracks, 0);    
+    n_temp_tracks = print_layout(fn_temp, netlist_n, nFins, maxTracks, 0);
+    max_temp = max(p_temp_tracks, n_temp_tracks);
+    
+    vector<int> fn_temp2;
+    
+    fn_temp2 = fn_temp;
+    
+    if (max_temp <= fn_max){
+        do {
+            fn_temp = fn_temp2;
+            fn_temp2 = optimizing_sposI(fn_temp2, netlist_n);
+        } while(fn_temp2 != fn_temp);
+    }
 //    
-//    if(fp_max > fn_max)
-//        cout << "Segunda opção";
-//    else cout << "Primeira opção";
+    fn_pos = fn_temp2;
+    sp_pos = sp_temp;
+    p_temp_tracks = print_layout(sp_pos, netlist_p, pFins, maxTracks, 1);
+    n_temp_tracks = print_layout(fn_pos, netlist_n, nFins, maxTracks, 1);
+    
+    int fn_total;
+    fn_max = max(p_temp_tracks, n_temp_tracks);
+    fn_total = p_temp_tracks + n_temp_tracks;
+   // cout << fn_max;
+    
+    if(fp_total > fn_total){
+        cout << "Segunda opção";
+        
+    }
+    else {
+        cout << "Primeira opção";
+    }
 
 }
     
