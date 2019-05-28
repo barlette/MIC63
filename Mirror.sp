@@ -24,7 +24,7 @@ MM15 GND B net7 GND nmos_rvt w=81.0n l=20n nfin=3
 MM16 net7 A CO GND nmos_rvt w=81.0n l=20n nfin=3
 MM17 GND A net8 GND nmos_rvt w=81.0n l=20n nfin=3
 MM18 GND B net8 GND nmos_rvt w=81.0n l=20n nfin=3
-MM19 GND CI ne8 GND nmos_rvt w=81.0n l=20n nfin=3
+MM19 GND CI net8 GND nmos_rvt w=81.0n l=20n nfin=3
 MM20 net8 CO S GND nmos_rvt w=81.0n l=20n nfin=3
 MM21 GND A net9 GND nmos_rvt w=81.0n l=20n nfin=3
 MM22 net9 B net10 GND nmos_rvt w=81.0n l=20n nfin=3

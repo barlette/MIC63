@@ -102,67 +102,6 @@ int find_samename_net(vector <int> pos, vector <Net> netlist, int net){
     return 0;
 }
 
-void construct_net_matrix(vector<Transistor> trans){
-    vector <string> inputs, pins_and_nets;
-
-    for(int it=0; it<trans.size(); it++){
-        inputs.push_back(trans[it].get_gate());
-        if(find(pins_and_nets.begin(), pins_and_nets.end(), trans[it].get_drain()) == pins_and_nets.end()){
-            pins_and_nets.push_back(trans[it].get_drain());
-        }
-        if(find(pins_and_nets.begin(), pins_and_nets.end(), trans[it].get_source()) == pins_and_nets.end()){
-            pins_and_nets.push_back(trans[it].get_source());
-        }
-    }
-    
-    vector <int> v(pins_and_nets.size(), 0);
-    vector < vector<int> > net_matrix(inputs.size(), v);
-    
-    for(int it=0; it<trans.size(); it++){
-        int input_index =   distance(inputs.begin(), find(inputs.begin(), inputs.end(), trans[it].get_gate()));
-        int drain_index =   distance(pins_and_nets.begin(), find(pins_and_nets.begin(), pins_and_nets.end(), trans[it].get_drain()));
-        int source_index =  distance(pins_and_nets.begin(), find(pins_and_nets.begin(), pins_and_nets.end(), trans[it].get_source()));
-        //cout << input_index << "\n";
-        //cout << drain_index << "\n";
-        //cout << source_index << "\n";
-        //std::distance(input_index, inputs.size());
-        net_matrix[input_index][drain_index] = 1;
-        net_matrix[input_index][source_index] = 1;
-    }
-    
-    vector <int> visited(inputs.size(), 0);
-    int parallel_count=1;
-    
-    for(int row1=0; row1 < net_matrix.size(); row1++){
-        visited[row1]=1;
-        
-        for(int row2=0; row2 < net_matrix.size(); row2++){
-            if((visited[row2] == 0) && (net_matrix[row1] == net_matrix[row2])){
-                visited[row2]=1;
-                cout << inputs[row1];
-                cout << inputs[row2];
-                parallel_count++;
-            }
-        }
-    }
-    cout << "Elementos em paralelo: " << parallel_count << "\n";
-    
-    for(int row=0; row < net_matrix.size(); row++){
-        for(int column=0; column < net_matrix[row].size(); column++){
-            cout << net_matrix[row][column] << " ";
-        }
-        cout << "\n";
-    }
-    
-    for(int it=0; it<inputs.size(); it++)
-        cout << inputs[it] << " ";
-    cout << "\n";
-    for(int it=0; it<pins_and_nets.size(); it++)
-        cout << pins_and_nets[it] << " ";
-    cout << "\n";
-    
-}
-
 int print_layout(vector<int> pos, vector<Net> netlist_p, int maxFins, int maxTracks, int output){
     string grade[maxFins][(2*maxTracks)-1];
     cout << "\n";
@@ -386,90 +325,200 @@ int max(int i, int v){
  *                          POSICIONAMENTO PRÉVIO   -> vector <int> pos;
  *                          NETLIST                 -> vector <Net> netlist;
  */
-vector <int> optimizing_sposI(vector <int> pos, vector<Net> netlist){
-    //vector <int> pos_temp;
+vector <int> optimizing_sposI(vector <int> spos, vector<Net> snetlist){
+    vector<int> temp;
+    vector < vector<int> > sep;
+    for(int it =0; it<spos.size();it++){
+        //cout << it << " ";
+        vector<int>::const_iterator first = spos.begin()+it;
+        vector<int>::const_iterator last = spos.begin()+it+3;
+        temp = vector <int> (first, last);        
+        sep.push_back(temp);
+        it = it+2;
+    }
     
-    for(int it=0; it<pos.size()-3;it++){
-        if((netlist[pos[it]].name != "VDD") && (netlist[pos[it]].name != "GND") && (netlist[pos[it]].type != GATE)){
-            if((netlist[pos[it]].name != netlist[pos[it+1]].name) && (netlist[pos[it+1]].type == GATE)) {
-                if((netlist[pos[it]].name == netlist[pos[it+3]].name) && (netlist[pos[it+2]].type == ACTIVE) && (netlist[pos[it+3]].name != netlist[pos[it+2]].name)){
-                    int it2=it+3;
-                    int temp = pos[it+2];
-                    pos[it+2] = pos[it];
-                    pos[it] = temp;
-                    it=it+3;
-                } else if((netlist[pos[it+1]].type == GATE) &&(netlist[pos[it+2]].name != netlist[pos[it+3]].name) && (netlist[pos[it+5]].name == netlist[pos[it]].name)){
-                    int it2=it+3;
-                    int temp = pos[it+2];
-                    pos[it+2] = pos[it];
-                    pos[it] = temp;
-                    
-                    it2 = it+5;
-                    temp = pos[it2];
-                    pos[it2] = pos[it2-2];
-                    pos[it2-2] = temp;
-                    it = it+5;
-                }
-            } else if((netlist[pos[it]].name != netlist[pos[it+1]].name) && (netlist[pos[it+1]].type != GATE)){
-                int it2=it+3;
-                if((netlist[pos[it]].name == netlist[pos[it2]].name) && (netlist[pos[it2-1]].type == GATE) && (netlist[pos[it2]].name != netlist[pos[it2+1]].name)){
-                    int temp = pos[it2];
-                    pos[it2] = pos[it2-2];
-                    pos[it2-2] = temp;
-                    it = it+3;
-                }
-            } 
+    if(sep.size() == 1){
+        return spos;
+    }
+    
+//    cout << "\n";
+//    for(int it =0; it<sep.size(); it++){
+//        for(int it2 = 0; it2<sep[it].size();it2++){
+//            cout << sep[it][it2] << " ";
+//        }
+//        cout << "\n";
+//    }
+//   
+//    cout << "\n";
+    
+    for(int it =0; it<sep.size()-1; it++){
+        int it2 = it+1;
+        if((it == 0) || snetlist[sep[it][0]].name != snetlist[sep[it-1][sep[it-1].size()-1]].name){
+            if((snetlist[sep[it][0]].name == snetlist[sep[it2][0]].name)){
+                reverse(sep[it].begin(), sep[it].end());
+            } else if (snetlist[sep[it][0]].name == snetlist[sep[it2][sep[it2].size()-1]].name){
+                reverse(sep[it].begin(), sep[it].end());
+                reverse(sep[it2].begin(), sep[it2].end());              
+            } else if(snetlist[sep[it][sep[it].size()-1]].name == snetlist[sep[it2][sep[it2].size()-1]].name){
+                //cout << "ALO";
+                reverse(sep[it2].begin(), sep[it2].end());              
+            }
+        } else {            
+            if(snetlist[sep[it][sep[it].size()-1]].name == snetlist[sep[it2][sep[it2].size()-1]].name){
+                //cout << "ALO";
+                reverse(sep[it2].begin(), sep[it2].end());              
+            }            
         }
-    }   
-//    for(int it=0; it<pos.size(); it++)
-//        cout << netlist[pos[it]].name << " ";
-    return pos;
+    }
+ 
+
+    int index =0;
+    for(int it =0; it<sep.size(); it++){
+        for(int it2 = 0; it2<sep[it].size();it2++){
+            //cout << sep[it][it2] << " ";
+            spos[index] = sep[it][it2];
+            index++;
+        }
+        //cout << "\n";
+    }
+    
+    return spos;
+}
+
+vector <int> optimizing_sposIII(vector <int> spos, vector<Net> snetlist){
+    vector<int> temp;
+    vector < vector<int> > sep;
+    for(int it =0; it<spos.size();it++){
+        if((snetlist[spos[it]].type == ACTIVE) && (snetlist[spos[it+1]].type == GATE) && ((snetlist[spos[it]].name != snetlist[spos[it-1]].name) || it==0)){
+            //cout << it << "\n";
+            //cout<< "it: " << snetlist[spos[it]].name << " ";
+            for(int it2 = it+1; it2 <spos.size(); it2++){
+                //cout << it2 << " ";
+                if((snetlist[spos[it2]].name != snetlist[spos[it2+1]].name) && (snetlist[spos[it2]].type == ACTIVE) && (snetlist[spos[it2+1]].type == ACTIVE)){
+                    //cout << "it2: " << snetlist[spos[it2]].name << " ";
+                    vector<int>::const_iterator first = spos.begin()+it;
+                    vector<int>::const_iterator last = spos.begin()+it2+1;
+                    temp = vector <int> (first, last);
+                    it2 = spos.size();
+                } else if (it2 == spos.size()-1){
+                    //cout << "TESTE5555";
+                    //cout << "it2: " << snetlist[spos[it2]].name << " ";
+                    vector<int>::const_iterator first = spos.begin()+it;
+                    vector<int>::const_iterator last = spos.begin()+it2+1;
+                    temp = vector <int> (first, last);
+                    it2 = spos.size();                    
+                }
+            }
+            sep.push_back(temp);
+        }
+    }
+    
+    if(sep.size() == 1){
+        return spos;
+    }
+    
+//    cout << "\n";
+//    for(int it =0; it<sep.size(); it++){
+//        for(int it2 = 0; it2<sep[it].size();it2++){
+//            cout << sep[it][it2] << " ";
+//        }
+//        cout << "\n";
+//    }
+    
+   // cout << "\n";
+    
+    for(int it =0; it<sep.size(); it++){
+        for(int it2 = it+1; it2<sep.size();it2++){
+            if(snetlist[sep[it][0]].name == snetlist[sep[it2][0]].name){
+                reverse(sep[it].begin(), sep[it].end());
+                temp = sep[it+1];
+                sep[it+1] = sep[it2];
+                sep[it2] = temp;
+            } else if (snetlist[sep[it][0]].name == snetlist[sep[it2][sep[it2].size()-1]].name){
+                reverse(sep[it].begin(), sep[it].end());
+                reverse(sep[it2].begin(), sep[it2].end());
+                temp = sep[it+1];
+                sep[it+1] = sep[it2];
+                sep[it2] = temp;               
+            } else if(snetlist[sep[it][sep[it].size()-1]].name == snetlist[sep[it2][0]].name){
+                temp = sep[it+1];
+                sep[it+1] = sep[it2];
+                sep[it2] = temp; 
+            } else if(snetlist[sep[it][sep[it].size()-1]].name == snetlist[sep[it2][sep[it2].size()-1]].name){
+                reverse(sep[it2].begin(), sep[it2].end());
+                temp = sep[it+1];
+                sep[it+1] = sep[it2];
+                sep[it2] = temp;                 
+            }
+        }
+    }
+
+    int index =0;
+    for(int it =0; it<sep.size(); it++){
+        for(int it2 = 0; it2<sep[it].size();it2++){
+            //cout << sep[it][it2] << " ";
+            spos[index] = sep[it][it2];
+            index++;
+        }
+        //cout << "\n";
+    }
+    
+    return spos;
 }
 
 pair< vector <int>, vector <int> > optimizing_sposII(vector <int> spos, vector<Net> snetlist, vector <int> fpos, vector<Net> fnetlist){   
-    int first_net = 0;
-    int break_det =0;
 
-    for(int it=0; it<spos.size();it++){
-        if((snetlist[spos[it]].name != "VDD") && (snetlist[spos[it]].name != "GND") && (snetlist[spos[it]].type == ACTIVE) && (snetlist[spos[it]].name != snetlist[spos[it+1]].name)){
-            first_net = it;
-            for(int it2=it; it2<spos.size();it2++){
-                if((snetlist[spos[it2]].name != snetlist[spos[it2+1]].name) && (snetlist[spos[it2]].type == ACTIVE) && (snetlist[spos[it2+1]].type == ACTIVE) && ((snetlist[spos[it2]].name == "GND") || (snetlist[spos[it2]].name == "VDD")) && ((it2 - first_net) > 2)){
-                    break_det = it2;
-                    //cout<< snetlist[spos[it2]].name << " ";
-                    reverse(spos.begin()+it, spos.begin()+it2+1);
-                    reverse(fpos.begin()+it, fpos.begin()+it2+1);
-                    it = it2+1;
-                    it2 = spos.size();
-                    } else if((snetlist[spos[it2]].name != snetlist[spos[it2+1]].name) && (snetlist[spos[it2]].type == ACTIVE) && (snetlist[spos[it2+1]].type == ACTIVE) && (snetlist[spos[it2]].name != "GND") && (snetlist[spos[it2]].name != "VDD")){
-                        it=it2+1; it2 = spos.size();
-                    }
-                }
+    spos = optimizing_sposIII(spos, snetlist);  
+
+    
+    //cout << "teste2\n"; 
+    for(int it=0; it<spos.size(); it++){
+        //cout << fnetlist[fpos[it]].name << " " << snetlist[spos[it]].name << "\n";
+        if((snetlist[spos[it]].type == GATE) && (fnetlist[fpos[it]].name != snetlist[spos[it]].name)){
+            //cout << fnetlist[fpos[it]].name << "\n";
+            for(int it2=it+3;it2<fpos.size();it2++){
+                if(fnetlist[fpos[it2]].name == snetlist[spos[it]].name){
+                    //cout << fnetlist[fpos[it2]].name << "\n";
+//                    for(int it3=0; it3<fpos.size(); it3++)
+//                        cout << fpos[it3] << " ";
+//                    cout << "\n";
+                    auto ind = fpos.insert(fpos.begin()+it-1, fpos[it2-1]);
+                    
+//                    for(int it3=0; it3<fpos.size(); it3++)
+//                        cout << fpos[it3] << " ";
+//                    cout << "\n";
+                    fpos.erase(fpos.begin()+it2);
+                    
+//                    for(int it3=0; it3<fpos.size(); it3++)
+//                        cout << fpos[it3] << " ";
+//                    cout << "\n\n";
+                    
+                    ind = fpos.insert(ind+1, fpos[it2]);
+                    
+//                    for(int it3=0; it3<fpos.size(); it3++)
+//                        cout << fpos[it3] << " ";
+//                    cout << "\n";
+                    fpos.erase(fpos.begin()+it2+1);
+                    
+//                    for(int it3=0; it3<fpos.size(); it3++)
+//                        cout << fpos[it3] << " ";
+//                    cout << "\n\n";
+                    
+                    
+                    fpos.insert(ind+1, fpos[it2+1]);
+//                    for(int it3=0; it3<fpos.size(); it3++)
+//                        cout << fpos[it3] << " ";
+//                    cout << "\n";                    
+                    fpos.erase(fpos.begin()+it2+2);
+//                    for(int it3=0; it3<fpos.size(); it3++)
+//                        cout << fpos[it3] << " ";
+//                    cout << "\n\n";    
+                    
+                    it2 = fpos.size();
+                } 
             }
         }
-    
-    int it=0;
-    
-    while(it < spos.size()-1){
-        if((snetlist[spos[it]].type == ACTIVE) && (snetlist[spos[it+1]].type == ACTIVE) && (snetlist[spos[it]].name != snetlist[spos[it+1]].name)){
-            cout << snetlist[spos[it]].name;
-            for(int it2=it+1; it2<spos.size();it2++){
-                if((snetlist[spos[it2]].name == snetlist[spos[it]].name) && (snetlist[spos[it2]].name != snetlist[spos[it2-1]].name) && (snetlist[spos[it2]].type == snetlist[spos[it2-1]].type)){
-                    //cout << snetlist[spos[it2]].name;
-                    //cout << snetlist[spos[it2+1]].name << " " << snetlist[spos[it2+2]].name << "\n";                    
-                    spos.insert(spos.begin()+it+1, spos.begin()+it2, spos.begin()+it2+3);
-                    spos.erase(spos.begin()+it2+3, spos.begin()+it2+6);
-                    fpos.insert(fpos.begin()+it+1, fpos.begin()+it2, fpos.begin()+it2+3);
-                    fpos.erase(fpos.begin()+it2+3, fpos.begin()+it2+6);
-
-                    it = it+3;
-                    it2 = spos.size();
-                }
-            }
-        }
-        it++;
     }
-    
     
     pair < vector <int>, vector <int> > result;
     result.first = spos;
@@ -550,106 +599,181 @@ void place(string fileName){
     
     vector<int> fp_pos, fn_pos, sp_pos, sn_pos;
     int fp_pos_tracks, fn_pos_tracks, sp_pos_tracks, sn_pos_tracks;
-    vector<int> sn_temp, fp_temp;
+    
     int n_temp_tracks, p_temp_tracks, max_temp;
     pair < vector <int>, vector <int> > opt;    
     fp_pos = fstackPlacement(gp, netlist_p, maxTracks, maxFins);
     sn_pos = sstackPlacement(fp_pos, netlist_p, netlist_n, maxFins, maxTracks);
-    fp_pos_tracks = print_layout(fp_pos, netlist_p, pFins, maxTracks, 0);    
-    sn_pos_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 0);
-    sn_pos = optimizing_sposI(sn_pos, netlist_n);
-    sn_pos_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 0);
-    int fp_max = max(fp_pos_tracks, sn_pos_tracks);    
-
-    opt = optimizing_sposII(sn_pos, netlist_n, fp_pos, netlist_p);
-    sn_temp = opt.first;
-    fp_temp = opt.second;
-  
-  
+    fp_pos_tracks = print_layout(fp_pos, netlist_p, pFins, maxTracks, 1);    
+    sn_pos_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 1);
     
- 
-    p_temp_tracks = print_layout(fp_temp, netlist_p, pFins, maxTracks, 0);    
-    n_temp_tracks = print_layout(sn_temp, netlist_n, nFins, maxTracks, 0);
-    max_temp = max(p_temp_tracks, n_temp_tracks);
+    int last_tracks;
+    int f_temp_tracks = fp_pos_tracks;
+    int s_temp_tracks = sn_pos_tracks;
+    vector<int> s_pos = sn_pos;
+    vector<int> f_pos = fp_pos;
+    vector<Net> netlist_s = netlist_n;
+    vector<Net> netlist_f = netlist_p;
+    vector<int> s_temp = s_pos, f_temp = f_pos;
+    int last_s_tracks;
+    vector <int> last_pos;
     
-    vector<int> fp_temp2, sn_temp2, last;
-    
-    fp_temp2 = fp_temp;
-    sn_temp2 = sn_temp;
-    if (max_temp <= fp_max){
+    //cout << "teste1";
         do {
-            //fp_temp = fp_temp2;
-            //fp_temp2 = optimizing_sposI(fp_temp2, netlist_p);
-            sn_temp = sn_temp2;
-            sn_temp2 = optimizing_sposI(sn_temp2, netlist_n);
-        } while(fp_temp2 != fp_temp);
-    }
-  
-    fp_pos = fp_temp2;
-    sn_pos = sn_temp2;
-    p_temp_tracks = print_layout(fp_pos, netlist_p, pFins, maxTracks, 1);
-    n_temp_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 1);
+            //cout << "teste2";
+            last_pos = s_temp;
+            s_temp = optimizing_sposI(s_pos, netlist_s);
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 1);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 1);
+        } while(last_pos != s_temp);
+        s_pos = s_temp;
+        cout << "teste3";
+        f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 1);    
+        s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 1);
+        //cout << s_temp_tracks;
+        //cout << "\n";
+        //for(int it=0; it<s_pos.size(); it++)
+            //cout << sn_pos[it] << " ";
+        //cout << "\n";
+        do {
+            cout << "teste4";
+            last_s_tracks = s_temp_tracks;
+            opt = optimizing_sposII(s_pos, netlist_s, f_pos, netlist_f);
+            s_temp = opt.first;
+            f_temp = opt.second;
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
+            if(last_s_tracks > s_temp_tracks){
+                s_pos = s_temp;
+                f_pos = f_temp;
+            }
+        } while(last_s_tracks > s_temp_tracks);
+        //cout << "teste5";
+        //cout << s_temp_tracks;
+       
+        int last_f_tracks; 
+        do {
+            //cout << "teste4";
+            last_f_tracks = f_temp_tracks;
+            opt = optimizing_sposII(f_pos, netlist_f, s_pos, netlist_s);
+            f_temp = opt.first;
+            s_temp = opt.second;
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
+            if(last_f_tracks > f_temp_tracks){
+                s_pos = s_temp;
+                f_pos = f_temp;
+            }
+        } while(last_f_tracks > f_temp_tracks);
+//        cout << "teste5";
+//        cout << f_temp_tracks;
+        
+                do {
+            //cout << "teste2";
+            last_pos = s_temp;
+            s_temp = optimizing_sposI(s_pos, netlist_s);
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
+        } while(last_pos != s_temp);
+        s_pos = s_temp;
+       //cout << "teste3";
+        f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 0);    
+        s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 0);   
+       
+        sn_pos = s_pos;
+        fp_pos = f_pos;
+        
+        
+        
     
-    int fp_total;
-    fp_max = max(p_temp_tracks, n_temp_tracks);
-    fp_total = p_temp_tracks + n_temp_tracks;
-    //cout << fp_max;
-    
-    
-    cout << "\n\n";
-    
-     
+
     fn_pos = fstackPlacement(gn, netlist_n, maxTracks, maxFins);
     sp_pos = sstackPlacement(fn_pos, netlist_n, netlist_p, maxFins, maxTracks);
-    //cout << "\nPSTACK\n";
     sp_pos_tracks = print_layout(sp_pos, netlist_p, pFins, maxTracks, 0); 
-    //cout << "\nNSTACK\n";
     fn_pos_tracks = print_layout(fn_pos, netlist_n, nFins, maxTracks, 0);
- 
-    sp_pos = optimizing_sposI(sp_pos, netlist_p);
-    sp_pos_tracks = print_layout(sp_pos, netlist_p, pFins, maxTracks, 0);  
-    int fn_max = max(fn_pos_tracks, sp_pos_tracks);
-   
-    vector<int> fn_temp, sp_temp;
-    opt = optimizing_sposII(sp_pos, netlist_p, fn_pos, netlist_n);
-    sp_temp = opt.first;
-    fn_temp = opt.second;    
-// 
-    p_temp_tracks = print_layout(sp_temp, netlist_p, pFins, maxTracks, 0);    
-    n_temp_tracks = print_layout(fn_temp, netlist_n, nFins, maxTracks, 0);
-    max_temp = max(p_temp_tracks, n_temp_tracks);
     
-    vector<int> fn_temp2;
+    f_temp_tracks = fn_pos_tracks;
+    s_temp_tracks = sp_pos_tracks;
+    s_pos = sp_pos;
+    f_pos = fn_pos;
+    netlist_s = netlist_p;
+    netlist_f = netlist_n;
+    s_temp = s_pos; 
+    f_temp = f_pos;
     
-    fn_temp2 = fn_temp;
-    
-    if (max_temp <= fn_max){
+    //cout << "teste1";
         do {
-            fn_temp = fn_temp2;
-            fn_temp2 = optimizing_sposI(fn_temp2, netlist_n);
-        } while(fn_temp2 != fn_temp);
-    }
-//    
-    fn_pos = fn_temp2;
-    sp_pos = sp_temp;
-    p_temp_tracks = print_layout(sp_pos, netlist_p, pFins, maxTracks, 1);
-    n_temp_tracks = print_layout(fn_pos, netlist_n, nFins, maxTracks, 1);
-    
-    int fn_total;
-    fn_max = max(p_temp_tracks, n_temp_tracks);
-    fn_total = p_temp_tracks + n_temp_tracks;
-   // cout << fn_max;
-    
-    if(fp_total > fn_total){
-        cout << "Segunda opção";
+            //cout << "teste2";
+            last_s_tracks = s_temp_tracks;
+            s_temp = optimizing_sposI(s_pos, netlist_s);
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
+            if(last_s_tracks > s_temp_tracks){
+                //cout << "oi\n";
+                s_pos = s_temp;
+            }
+        } while(last_s_tracks > s_temp_tracks);
+       // cout << "teste3";
+        f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 0);    
+        s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 0);
+        //cout << s_temp_tracks;
+       // cout << "\n";
+        for(int it=0; it<s_pos.size(); it++)
+           // cout << sn_pos[it] << " ";
+        //cout << "\n";
+        do {
+            // << "teste4";
+            last_s_tracks = s_temp_tracks;
+            opt = optimizing_sposII(s_pos, netlist_s, f_pos, netlist_f);
+            s_temp = opt.first;
+            f_temp = opt.second;
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
+            if(last_s_tracks > s_temp_tracks){
+                s_pos = s_temp;
+                f_pos = f_temp;
+            }
+        } while(last_s_tracks > s_temp_tracks);
+        //cout << "teste5";
+        //cout << s_temp_tracks; 
+        do {
+            //cout << "teste6";
+            last_f_tracks = f_temp_tracks;
+            f_temp = optimizing_sposI(f_pos, netlist_f);
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
+            s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 0);
+            if(last_f_tracks > f_temp_tracks){
+                f_pos = f_temp;
+            }
+        } while(last_f_tracks > f_temp_tracks);  
         
-    }
-    else if (fp_total < fn_total){
-        cout << "Primeira opção";
-    } else cout << "Qualquer umas das opções";
+         do {
+            //cout << "teste2";
+            last_s_tracks = s_temp_tracks;
+            s_temp = optimizing_sposI(s_pos, netlist_s);
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
+            if(last_s_tracks > s_temp_tracks){
+                //cout << "oi\n";
+                s_pos = s_temp;
+            }
+        } while(last_s_tracks > s_temp_tracks);
+        //cout << "teste3";
+        f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 0);    
+        s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 0);
+        
+        sp_pos = s_pos;
+        fn_pos = f_pos;
+        
+        cout << "#### FIRST P ####\n";
+        fp_pos_tracks = print_layout(fp_pos, netlist_p, pFins, maxTracks, 1);    
+        sn_pos_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 1);         
+        cout << "#################\n";
+        cout << "#### FIRST N ####\n";
+        sp_pos_tracks = print_layout(sp_pos, netlist_p, pFins, maxTracks, 1);         
+        fn_pos_tracks = print_layout(fn_pos, netlist_n, nFins, maxTracks, 1);     
+        cout << "#################\n";
 
-    
-    
 }
     
     
