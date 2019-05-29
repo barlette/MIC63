@@ -275,31 +275,34 @@ vector <int> sstackPlacement(vector <int> fpos, vector<Net> fnetlist, vector <Ne
                     visited[it2-1] = 1;
                     selected_gate = it2;
                     spos[pos_index-1] = selected_gate-1;
+                    //cout << selected_gate-1 << " " << selected_gate << " " << selected_gate+1 << " "; 
                     spos[pos_index] = selected_gate;
                     spos[pos_index+1] = selected_gate+1;
                     pos_index = pos_index+3;
+                    it2 = snetlist.size();
                 }
             }
         }
     }
-//    cout << "\n";
+    
+//    cout << "TESTANDO MIRROR\n";
 //    for(int it=0; it<spos.size(); it++){
-//        cout << snetlist[spos[it]].name << " ";        
+//        cout << spos[it] << " ";        
 //    }
     
-    int index=0;
-    if((snetlist[spos[index]].name == snetlist[spos[index+3]].name) && (snetlist[spos[index]].type == ACTIVE) && (snetlist[spos[index+3]].type == ACTIVE)){
-            spos[index] = spos[index+2];
-            spos[index+2] = spos[index+3];
-        }
-    
-    for(int it=5; it<spos.size()-3; it++){
-        if((snetlist[spos[it]].name == snetlist[spos[it+3]].name) && (snetlist[spos[it]].type == ACTIVE) && (snetlist[spos[it+3]].type == ACTIVE)){
-            spos[it+3] = spos[it+1]; 
-            spos[it+1] = spos[it];
-            //it = it+3;
-        }
-    }
+//    int index=0;
+//    if((snetlist[spos[index]].name == snetlist[spos[index+3]].name) && (snetlist[spos[index]].type == ACTIVE) && (snetlist[spos[index+3]].type == ACTIVE)){
+//            spos[index] = spos[index+2];
+//            spos[index+2] = spos[index+3];
+//        }
+//    
+//    for(int it=5; it<spos.size()-3; it++){
+//        if((snetlist[spos[it]].name == snetlist[spos[it+3]].name) && (snetlist[spos[it]].type == ACTIVE) && (snetlist[spos[it+3]].type == ACTIVE)){
+//            spos[it+3] = spos[it+1]; 
+//            spos[it+1] = spos[it];
+//            //it = it+3;
+//        }
+//    }
 //    cout << "\n";
 //    for(int it=0; it<spos.size(); it++){
 //        cout << snetlist[spos[it]].name << " ";        
@@ -389,26 +392,31 @@ vector <int> optimizing_sposIII(vector <int> spos, vector<Net> snetlist){
     vector<int> temp;
     vector < vector<int> > sep;
     for(int it =0; it<spos.size();it++){
-        if((snetlist[spos[it]].type == ACTIVE) && (snetlist[spos[it+1]].type == GATE) && ((snetlist[spos[it]].name != snetlist[spos[it-1]].name) || it==0)){
-            //cout << it << "\n";
-            //cout<< "it: " << snetlist[spos[it]].name << " ";
+        if((snetlist[spos[it]].type == ACTIVE) && (snetlist[spos[it+1]].type == GATE) && (it==0 || (snetlist[spos[it]].name != snetlist[spos[it-1]].name))){
+            cout << "it number:" << it << "\n";
+            cout<< "it: " << snetlist[spos[it]].name << " ";
             for(int it2 = it+1; it2 <spos.size(); it2++){
-                //cout << it2 << " ";
-                if((snetlist[spos[it2]].name != snetlist[spos[it2+1]].name) && (snetlist[spos[it2]].type == ACTIVE) && (snetlist[spos[it2+1]].type == ACTIVE)){
-                    //cout << "it2: " << snetlist[spos[it2]].name << " ";
+                //cout << "it2 number: " << it2 << " ";
+                if (it2 == spos.size()-1){
+                    cout << "TESTE5555";
+                    cout << "it2: " << snetlist[spos[it2]].name << " ";
                     vector<int>::const_iterator first = spos.begin()+it;
                     vector<int>::const_iterator last = spos.begin()+it2+1;
                     temp = vector <int> (first, last);
-                    it2 = spos.size();
-                } else if (it2 == spos.size()-1){
-                    //cout << "TESTE5555";
-                    //cout << "it2: " << snetlist[spos[it2]].name << " ";
-                    vector<int>::const_iterator first = spos.begin()+it;
-                    vector<int>::const_iterator last = spos.begin()+it2+1;
-                    temp = vector <int> (first, last);
+                    it=it2+1;
                     it2 = spos.size();                    
+                } else if((snetlist[spos[it2]].name != snetlist[spos[it2+1]].name) && (snetlist[spos[it2]].type == ACTIVE) && (snetlist[spos[it2+1]].type == ACTIVE)){
+                    cout << "it2: " << snetlist[spos[it2]].name << " ";
+                    vector<int>::const_iterator first = spos.begin()+it;
+                    vector<int>::const_iterator last = spos.begin()+it2+1;
+                    temp = vector <int> (first, last);
+                    //it=it2+1;
+                    it2 = spos.size();
                 }
             }
+            
+            for(int it3 =0;it3<temp.size();it3++)
+                cout << temp[it3] << " ";
             sep.push_back(temp);
         }
     }
@@ -417,13 +425,13 @@ vector <int> optimizing_sposIII(vector <int> spos, vector<Net> snetlist){
         return spos;
     }
     
-//    cout << "\n";
-//    for(int it =0; it<sep.size(); it++){
-//        for(int it2 = 0; it2<sep[it].size();it2++){
-//            cout << sep[it][it2] << " ";
-//        }
-//        cout << "\n";
-//    }
+    cout << "\n";
+    for(int it =0; it<sep.size(); it++){
+        for(int it2 = 0; it2<sep[it].size();it2++){
+            cout << sep[it][it2] << " ";
+        }
+        cout << "\n";
+    }
     
    // cout << "\n";
     
@@ -454,16 +462,17 @@ vector <int> optimizing_sposIII(vector <int> spos, vector<Net> snetlist){
     }
 
     int index =0;
+    vector<int> temp_pos; 
     for(int it =0; it<sep.size(); it++){
         for(int it2 = 0; it2<sep[it].size();it2++){
             //cout << sep[it][it2] << " ";
-            spos[index] = sep[it][it2];
-            index++;
+            temp_pos.push_back(sep[it][it2]);
+            //index++;
         }
         //cout << "\n";
     }
     
-    return spos;
+    return temp_pos;
 }
 
 pair< vector <int>, vector <int> > optimizing_sposII(vector <int> spos, vector<Net> snetlist, vector <int> fpos, vector<Net> fnetlist){   
@@ -478,42 +487,12 @@ pair< vector <int>, vector <int> > optimizing_sposII(vector <int> spos, vector<N
             //cout << fnetlist[fpos[it]].name << "\n";
             for(int it2=it+3;it2<fpos.size();it2++){
                 if(fnetlist[fpos[it2]].name == snetlist[spos[it]].name){
-                    //cout << fnetlist[fpos[it2]].name << "\n";
-//                    for(int it3=0; it3<fpos.size(); it3++)
-//                        cout << fpos[it3] << " ";
-//                    cout << "\n";
                     auto ind = fpos.insert(fpos.begin()+it-1, fpos[it2-1]);
-                    
-//                    for(int it3=0; it3<fpos.size(); it3++)
-//                        cout << fpos[it3] << " ";
-//                    cout << "\n";
                     fpos.erase(fpos.begin()+it2);
-                    
-//                    for(int it3=0; it3<fpos.size(); it3++)
-//                        cout << fpos[it3] << " ";
-//                    cout << "\n\n";
-                    
                     ind = fpos.insert(ind+1, fpos[it2]);
-                    
-//                    for(int it3=0; it3<fpos.size(); it3++)
-//                        cout << fpos[it3] << " ";
-//                    cout << "\n";
                     fpos.erase(fpos.begin()+it2+1);
-                    
-//                    for(int it3=0; it3<fpos.size(); it3++)
-//                        cout << fpos[it3] << " ";
-//                    cout << "\n\n";
-                    
-                    
-                    fpos.insert(ind+1, fpos[it2+1]);
-//                    for(int it3=0; it3<fpos.size(); it3++)
-//                        cout << fpos[it3] << " ";
-//                    cout << "\n";                    
+                    fpos.insert(ind+1, fpos[it2+1]);                  
                     fpos.erase(fpos.begin()+it2+2);
-//                    for(int it3=0; it3<fpos.size(); it3++)
-//                        cout << fpos[it3] << " ";
-//                    cout << "\n\n";    
-                    
                     it2 = fpos.size();
                 } 
             }
@@ -525,14 +504,6 @@ pair< vector <int>, vector <int> > optimizing_sposII(vector <int> spos, vector<N
     result.second = fpos;
     return result;
 }
-
-//void generate_layout(vector <int> n_pos, vector <int> p_pos, vector<Net> netlist_p, vector<Net> netlist_n, int nFins, int pFins){
-//    //string grade[maxFins][(2*maxTracks)-1];
-//    
-//    for(int it=0; it<n_pos.size(); it++){
-//        
-//    }
-//}
 
 void place(string fileName){
     vector<Transistor> nSt;
@@ -604,8 +575,13 @@ void place(string fileName){
     pair < vector <int>, vector <int> > opt;    
     fp_pos = fstackPlacement(gp, netlist_p, maxTracks, maxFins);
     sn_pos = sstackPlacement(fp_pos, netlist_p, netlist_n, maxFins, maxTracks);
-    fp_pos_tracks = print_layout(fp_pos, netlist_p, pFins, maxTracks, 1);    
-    sn_pos_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 1);
+    cout << "\n";
+    for(int it=0; it<sn_pos.size(); it++)
+        cout << sn_pos[it] << " ";
+    fp_pos_tracks = print_layout(fp_pos, netlist_p, pFins, maxTracks, 0);    
+    sn_pos_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 0);
+    for(int it=0; it<sn_pos.size(); it++)
+        cout << sn_pos[it] << " ";
     
     int last_tracks;
     int f_temp_tracks = fp_pos_tracks;
@@ -623,18 +599,13 @@ void place(string fileName){
             //cout << "teste2";
             last_pos = s_temp;
             s_temp = optimizing_sposI(s_pos, netlist_s);
-            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 1);    
-            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 1);
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
         } while(last_pos != s_temp);
         s_pos = s_temp;
         cout << "teste3";
-        f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 1);    
-        s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 1);
-        //cout << s_temp_tracks;
-        //cout << "\n";
-        //for(int it=0; it<s_pos.size(); it++)
-            //cout << sn_pos[it] << " ";
-        //cout << "\n";
+        f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 0);    
+        s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 0);
         do {
             cout << "teste4";
             last_s_tracks = s_temp_tracks;
@@ -648,14 +619,13 @@ void place(string fileName){
                 f_pos = f_temp;
             }
         } while(last_s_tracks > s_temp_tracks);
-        //cout << "teste5";
-        //cout << s_temp_tracks;
-       
         int last_f_tracks; 
         do {
-            //cout << "teste4";
+            //cout << "teste654654:1";
             last_f_tracks = f_temp_tracks;
+            //cout << "teste654654:2";
             opt = optimizing_sposII(f_pos, netlist_f, s_pos, netlist_s);
+            //cout << "teste654654:3";
             f_temp = opt.first;
             s_temp = opt.second;
             f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
@@ -716,11 +686,6 @@ void place(string fileName){
        // cout << "teste3";
         f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 0);    
         s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 0);
-        //cout << s_temp_tracks;
-       // cout << "\n";
-        for(int it=0; it<s_pos.size(); it++)
-           // cout << sn_pos[it] << " ";
-        //cout << "\n";
         do {
             // << "teste4";
             last_s_tracks = s_temp_tracks;
@@ -734,8 +699,8 @@ void place(string fileName){
                 f_pos = f_temp;
             }
         } while(last_s_tracks > s_temp_tracks);
-        //cout << "teste5";
-        //cout << s_temp_tracks; 
+//        //cout << "teste5";
+//        //cout << s_temp_tracks; 
         do {
             //cout << "teste6";
             last_f_tracks = f_temp_tracks;
