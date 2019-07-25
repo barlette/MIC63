@@ -17,6 +17,9 @@
 #include "grapher.h"
 #include "stack.h"
 #include <unistd.h>
+
+
+
 using namespace std;
 
 int find_index_pair(int u, vector< pair<int, int> > edges, int whichone){
@@ -505,6 +508,216 @@ pair< vector <int>, vector <int> > optimizing_sposII(vector <int> spos, vector<N
     return result;
 }
 
+// renderizar matizes 1:1 para cada camada
+void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos, vector<Net> netlist_n, int nfin, int ntracks){
+    int height = (2*nfin)*7 + (2*nfin-1)*20 + 64;
+    int width = ntracks * 54;
+    
+    int GCUT[height][width];
+    int M1[height][width];
+    int LIG[height][width];
+    int FIN[height][width];
+    int CGATE[height][width];
+    int LISD[height][width];
+    int SDT[height][width];
+    int CACTIVE[height][width];
+    int SIGNAL[height][width];
+    
+        for(int it=0; it<height; it++){
+        for(int it2=0; it2<width; it2++){
+            SIGNAL[it][it2] = p_pos.size();
+        }
+        cout << "\n";
+    }
+    
+    for(int it=0; it<height; it++){
+        for(int it2=0; it2<width; it2++){
+            if(((it >= 0) && (it <= 43)) || ((it >= (height-44)) && (it <= (height-1)))){
+                GCUT[it][it2] = 1;
+            }
+            if(((it >= 13) && (it <= 30)) || ((it >= (height-31)) && (it <= (height-14)))){
+                M1[it][it2] = 1;
+            }
+            if(((it >= 14) && (it <= 29)) || ((it >= (height-30)) && (it <= (height-15)))){
+                LIG[it][it2] = 1;
+            }            
+            //cout << GCUT[it][it2];
+            cout << LIG[it][it2];
+        }
+        cout << "\n";
+    }
+   //cout << nfin;
+    cout << height << " nm " << width << " nm\n";
+    
+    int finHeight=0;
+    for(int itFin=0; itFin<(2*nfin); itFin++){
+        finHeight = 32+(itFin*27);
+        for(int it=finHeight; it<finHeight+7; it++){
+            for(int it2=0; it2<width; it2++){
+                FIN[it][it2] = 1;
+            }
+        }
+    }
+    
+    int gateWidth=0, netlist_iterator=0;
+    for(int itG=0; itG<ntracks; itG++){
+        gateWidth = 17+(itG*54);
+        for(int it=gateWidth; it<gateWidth+20; it++){
+            for(int it2=0; it2<height; it2++){
+                CGATE[it2][it] = 1;
+            }
+        }
+        if(itG != 0){
+            while((netlist_p[p_pos[netlist_iterator]].type != GATE) && (netlist_iterator<p_pos.size())){
+                netlist_iterator++;
+            }
+            for(int it=gateWidth; it<gateWidth+20; it++){
+                for(int it2=0; it2<height; it2++){
+                    SIGNAL[it2][it] = p_pos[netlist_iterator];
+                }
+            }           
+            if (netlist_iterator < p_pos.size())
+                netlist_iterator++;
+        }
+    }
+ 
+
+    
+    for(int it=0; it<height; it++){
+        for(int it2=0; it2<width; it2++){
+            cout << CGATE[it][it2];
+        }
+        cout << "\n";
+    }
+
+    
+    cout << "LISD\n\n\n";
+    Net lastNet;
+    int xcoord = 41, xactcoord = 45, ycoord = 48, ycontcoord = 22, lisdWidth = 24, lisdHeight = 81, lisdContHeight = 108, activeInitialWidth = 16, activeContWidth = 38;
+    for(int it=0; it<p_pos.size(); it++){
+        if(((lastNet.name != netlist_p[p_pos[it]].name) && (netlist_p[p_pos[it]].type == lastNet.type))){ // quebra
+            if(netlist_p[p_pos[it]].name == "VDD"){
+                if(it != 0){
+                    xcoord = xcoord+54;
+                    xactcoord = xactcoord+92;
+                }
+                for(int xc=xcoord; xc<xcoord+lisdWidth; xc++){
+                    for(int yc=ycontcoord; yc<ycontcoord+lisdContHeight; yc++){
+                        LISD[yc][xc] = 1;
+                    }
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        SDT[yc][xc] = 1;
+                        SIGNAL[yc][xc] = p_pos[it];
+                    }                  
+                }
+                for(int xc=xactcoord; xc<xactcoord+activeInitialWidth; xc++){
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        CACTIVE[yc][xc] = 1;
+                    }                 
+                }      
+                xactcoord = xactcoord+activeInitialWidth;
+                xcoord = xcoord+54;
+            } else {
+                if(it != 0){
+                    xcoord = xcoord+54;
+                    xactcoord = xactcoord+92;
+                }
+                for(int xc=xcoord; xc<xcoord+lisdWidth; xc++){
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        LISD[yc][xc] = 1;
+                        SDT[yc][xc] = 1;
+                        SIGNAL[yc][xc] = p_pos[it];                        
+                        //CACTIVE[yc][xc] = 1;
+                    }
+                }
+                for(int xc=xactcoord; xc<xactcoord+activeInitialWidth; xc++){
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        CACTIVE[yc][xc] = 1;
+                    }                 
+                }      
+                xactcoord = xactcoord+activeInitialWidth;
+                xcoord = xcoord+54;
+            }
+        //} else if (((lastNet.name == netlist_p[p_pos[it]].name) && (netlist_p[p_pos[it]].type == lastNet.type))){
+          //  xcoord = xcoord+30;
+        } else if ((netlist_p[p_pos[it]].type != lastNet.type) && (netlist_p[p_pos[it]].type == ACTIVE)){
+            if(netlist_p[p_pos[it]].name == "VDD"){
+                for(int xc=xcoord; xc<xcoord+lisdWidth; xc++){
+                    for(int yc=ycontcoord; yc<ycontcoord+lisdContHeight; yc++){
+                        LISD[yc][xc] = 1;
+                        SIGNAL[yc][xc] = p_pos[it];                        
+                    }
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        SDT[yc][xc] = 1;
+                        //CACTIVE[yc][xc] = 1;
+                    }
+                }
+                xcoord = xcoord+54;
+            } else {
+                for(int xc=xcoord; xc<xcoord+lisdWidth; xc++){
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        LISD[yc][xc] = 1;
+                        SDT[yc][xc] = 1;
+                         SIGNAL[yc][xc] = p_pos[it];                       
+                        //CACTIVE[yc][xc] = 1;
+                    }
+                }
+                xcoord = xcoord+54;
+            }
+            
+            for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                for(int xc=xactcoord; xc<xactcoord+activeInitialWidth; xc++){
+                    CACTIVE[yc][xc] = 1;                                          
+                }
+            }
+                xactcoord = xactcoord+activeInitialWidth;            
+        } else if ((netlist_p[p_pos[it]].type != lastNet.type) && (netlist_p[p_pos[it]].type == GATE)){
+                        for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                for(int xc=xactcoord; xc<xactcoord+activeContWidth; xc++){
+                    CACTIVE[yc][xc] = 1;                                          
+                }             
+            }  
+                xactcoord = xactcoord+activeContWidth;   
+        } 
+        lastNet = netlist_p[p_pos[it]];  
+    }
+//            for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+//                for(int xc=xactcoord; xc<xactcoord+activeInitialWidth; xc++){
+//                    CACTIVE[yc][xc] = 1;                                          
+//                }
+//            }  
+//            xactcoord = xactcoord+activeInitialWidth; 
+    
+    cout << "SIGNALS\n\n\n";    
+        for(int it=0; it<height; it++){
+        for(int it2=0; it2<width; it2++){
+            cout << SIGNAL[it][it2];
+        }
+        cout << "\n";
+    }    
+    cout << "LISD\n\n";
+        for(int it=0; it<height; it++){
+            for(int it2=0; it2<width; it2++){
+                cout << LISD[it][it2];
+            }
+            cout << "\n";
+        }
+    cout << "SDT\n\n";    
+        for(int it=0; it<height; it++){
+            for(int it2=0; it2<width; it2++){
+                cout << SDT[it][it2];
+            }
+            cout << "\n";
+        }
+    cout << "ACTIVE\n\n";    
+        for(int it=0; it<height; it++){
+            for(int it2=0; it2<width; it2++){
+                cout << CACTIVE[it][it2];
+            }
+            cout << "\n";
+        }   
+}
+
 void place(string fileName){
     vector<Transistor> nSt;
     vector<Transistor> pSt;
@@ -577,9 +790,10 @@ void place(string fileName){
     sn_pos = sstackPlacement(fp_pos, netlist_p, netlist_n, maxFins, maxTracks);
     cout << "\n";
     for(int it=0; it<sn_pos.size(); it++)
-        cout << sn_pos[it] << " ";
-    fp_pos_tracks = print_layout(fp_pos, netlist_p, pFins, maxTracks, 0);    
-    sn_pos_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 0);
+        cout << fp_pos[it] << " ";
+        //cout << sn_pos[it] << " ";
+    fp_pos_tracks = print_layout(fp_pos, netlist_p, pFins, maxTracks, 1);    
+    sn_pos_tracks = print_layout(sn_pos, netlist_n, nFins, maxTracks, 1);
     for(int it=0; it<sn_pos.size(); it++)
         cout << sn_pos[it] << " ";
     
@@ -598,22 +812,24 @@ void place(string fileName){
         do {
             //cout << "teste2";
             last_pos = s_temp;
+            cout << "Second positioning optimization, transistor mirroring only\n";
             s_temp = optimizing_sposI(s_pos, netlist_s);
-            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
-            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 1);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 1);
         } while(last_pos != s_temp);
         s_pos = s_temp;
         cout << "teste3";
-        f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 0);    
-        s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 0);
+        f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 1);    
+        s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 1);
         do {
             cout << "teste4";
             last_s_tracks = s_temp_tracks;
+             cout << "Second positioning optimization, blocks of transistors\n";
             opt = optimizing_sposII(s_pos, netlist_s, f_pos, netlist_f);
             s_temp = opt.first;
             f_temp = opt.second;
-            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
-            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 1);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 1);
             if(last_s_tracks > s_temp_tracks){
                 s_pos = s_temp;
                 f_pos = f_temp;
@@ -624,12 +840,13 @@ void place(string fileName){
             //cout << "teste654654:1";
             last_f_tracks = f_temp_tracks;
             //cout << "teste654654:2";
+            cout << "First positioning optimization, blocks of transistors\n";
             opt = optimizing_sposII(f_pos, netlist_f, s_pos, netlist_s);
             //cout << "teste654654:3";
             f_temp = opt.first;
             s_temp = opt.second;
-            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
-            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 1);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 1);
             if(last_f_tracks > f_temp_tracks){
                 s_pos = s_temp;
                 f_pos = f_temp;
@@ -641,14 +858,15 @@ void place(string fileName){
                 do {
             //cout << "teste2";
             last_pos = s_temp;
+            cout << "Second positioning optimization, transistor mirroring only\n";
             s_temp = optimizing_sposI(s_pos, netlist_s);
-            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 0);    
-            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 0);
+            f_temp_tracks = print_layout(f_temp, netlist_f, pFins, maxTracks, 1);    
+            s_temp_tracks = print_layout(s_temp, netlist_s, nFins, maxTracks, 1);
         } while(last_pos != s_temp);
         s_pos = s_temp;
        //cout << "teste3";
-        f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 0);    
-        s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 0);   
+        f_temp_tracks = print_layout(f_pos, netlist_f, pFins, maxTracks, 1);    
+        s_temp_tracks = print_layout(s_pos, netlist_s, nFins, maxTracks, 1);   
        
         sn_pos = s_pos;
         fp_pos = f_pos;
@@ -738,7 +956,14 @@ void place(string fileName){
         sp_pos_tracks = print_layout(sp_pos, netlist_p, pFins, maxTracks, 1);         
         fn_pos_tracks = print_layout(fn_pos, netlist_n, nFins, maxTracks, 1);     
         cout << "#################\n";
-
+        
+        
+        int minfp, minfn, numberTracks;
+        minfp =  std::max(fp_pos_tracks, sn_pos_tracks);
+        minfn =  std::max(fn_pos_tracks, sp_pos_tracks);
+        if(minfp < minfn)
+            renderizeMatrix(fp_pos, netlist_p, sn_pos, netlist_n, pFins, minfp);
+        else renderizeMatrix(sp_pos, netlist_p, fn_pos, netlist_n, nFins, minfn);
 }
     
     

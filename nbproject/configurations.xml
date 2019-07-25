@@ -50,6 +50,9 @@
       <compileType>
         <ccTool>
           <standard>8</standard>
+          <incDir>
+            <pElem>/usr/include/opencv4/</pElem>
+          </incDir>
         </ccTool>
       </compileType>
       <item path="circuit.h" ex="false" tool="3" flavor2="0">
