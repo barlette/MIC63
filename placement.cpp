@@ -513,21 +513,90 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
     int height = (2*nfin)*7 + (2*nfin-1)*20 + 64;
     int width = ntracks * 54;
     
-    int GCUT[height][width];
-    int M1[height][width];
-    int LIG[height][width];
-    int FIN[height][width];
-    int CGATE[height][width];
-    int LISD[height][width];
-    int SDT[height][width];
-    int CACTIVE[height][width];
-    int SIGNAL[height][width];
+    int     GCUT[height][width];
+    int     M1[height][width];
+    int     LIG[height][width];
+    int     FIN[height][width];
+    int     CGATE[height][width];
+    int     LISD[height][width];
+    int     SDT[height][width];
+    int     CACTIVE[height][width];
+    int    SIGNAL[height][width];
     
-        for(int it=0; it<height; it++){
-        for(int it2=0; it2<width; it2++){
-            SIGNAL[it][it2] = p_pos.size();
+    vector <Net> new_p, new_n, global;
+    vector <int> new_ppos, new_npos;
+    int exists=0;
+    //new indexing
+    for(int it=0; it<netlist_p.size();it++){
+        exists=0;
+        for(int it2=0; it2<new_p.size(); it2++){
+            if(netlist_p[it].name == new_p[it2].name){
+                exists=1;
+            }
         }
-        cout << "\n";
+        if(exists == 0){
+            new_p.push_back(netlist_p[it]);
+        }
+    }
+
+    for(int it=0; it<netlist_n.size();it++){
+        exists=0;
+        for(int it2=0; it2<new_n.size(); it2++){
+            if(netlist_n[it].name == new_n[it2].name){
+                exists=1;
+            }
+        }
+        if(exists == 0){
+            new_n.push_back(netlist_n[it]);
+        }
+    }
+    cout << "\n";
+    for(int it2=0; it2<new_p.size(); it2++){   
+        cout << new_p[it2].name << " ";
+    } 
+    cout << "\n";
+    for(int it2=0; it2<new_n.size(); it2++){   
+        cout << new_n[it2].name << " ";
+    }    
+    
+    for(int it=0;it<new_p.size();it++){
+        global.push_back(new_p[it]);
+    }
+    
+    for(int it=0;it<new_n.size();it++){
+        exists=0;
+        for(int it2=0;it2<global.size();it2++){
+            if(new_n[it].name == global[it2].name){
+                exists=1;
+            }
+        }
+        if(exists == 0){
+            global.push_back(new_n[it]);
+        }            
+    }
+    
+    cout << "GLOBAL\n";
+    for(int it2=0; it2<global.size(); it2++){   
+        cout << global[it2].name << " ";
+    }     
+    
+    
+    for(int it=0; it<p_pos.size();it++){
+        for(int it2=0; it2<global.size();it2++){
+            if(netlist_p[p_pos[it]].name == global[it2].name){
+                new_ppos.push_back(it2);
+                cout << it2;
+            }
+        }
+    }
+   
+    for(int it=0; it<n_pos.size();it++){
+        for(int it2=0; it2<global.size();it2++){
+            if(netlist_n[n_pos[it]].name == global[it2].name){
+                new_npos.push_back(it2);
+                cout << it2;
+            }
+        }
     }
     
     for(int it=0; it<height; it++){
@@ -559,7 +628,7 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
         }
     }
     
-    int gateWidth=0, netlist_iterator=0;
+    int gateWidth=0;
     for(int itG=0; itG<ntracks; itG++){
         gateWidth = 17+(itG*54);
         for(int it=gateWidth; it<gateWidth+20; it++){
@@ -567,21 +636,90 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
                 CGATE[it2][it] = 1;
             }
         }
-        if(itG != 0){
-            while((netlist_p[p_pos[netlist_iterator]].type != GATE) && (netlist_iterator<p_pos.size())){
-                netlist_iterator++;
-            }
-            for(int it=gateWidth; it<gateWidth+20; it++){
-                for(int it2=0; it2<height; it2++){
-                    SIGNAL[it2][it] = p_pos[netlist_iterator];
-                }
-            }           
-            if (netlist_iterator < p_pos.size())
-                netlist_iterator++;
-        }
     }
- 
+    
+    vector <int> p_pos_types, n_pos_types;
+    
+    for(int it=0; it<new_ppos.size()-2;it=it+3){
+        p_pos_types.push_back(ACTIVE);
+        p_pos_types.push_back(GATE);
+        p_pos_types.push_back(ACTIVE);
+    }
+    
+    for(int it=0; it<new_npos.size()-2;it=it+3){
+        n_pos_types.push_back(ACTIVE);
+        n_pos_types.push_back(GATE);
+        n_pos_types.push_back(ACTIVE);
+    }
+    
+    for(int it=0; it<new_npos.size();it++){
+        cout << n_pos_types[it] << " ";
 
+    }
+    cout << "\n";
+    
+    int last_ppos, sxcoord = 42, sycoord = 48, sHeigth = 81, actWidth = 24, space = 5;
+    gateWidth = 20;
+    for(int it=0; it<new_ppos.size(); it++){
+        cout << p_pos_types[it];
+            if(p_pos_types[it] == GATE){
+                for(int it2=sxcoord;it2<sxcoord+gateWidth;it2++){
+                    for(int it3=0; it3<height;it3++){
+                        SIGNAL[it3][it2] = new_ppos[it]+1;
+                    }
+                }
+                sxcoord = sxcoord + 25;
+            } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] != p_pos_types[it-1]) && (p_pos_types[it] == ACTIVE)/*&& (it != 0)*/){
+               // cout << it-1 << " " << it << "\n";
+                for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                    for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
+                        SIGNAL[it3][it2] = new_ppos[it]+1;
+                    }
+                }
+                sxcoord = sxcoord + 29;
+            } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] == p_pos_types[it-1])/*&& (it != 0)*/){
+                sxcoord = sxcoord+79;
+                for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                    for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
+                        SIGNAL[it3][it2] = new_ppos[it]+1;
+                    }
+                }
+                sxcoord = sxcoord + 29;
+            }
+    }
+    //54+48+81
+    
+    sxcoord = 42;
+    sycoord = 183;
+    for(int it=0; it<new_npos.size(); it++){
+        if(/*(global[new_npos[it]].name != global[new_npos[it-1]].name) &&*/ (n_pos_types[it] != n_pos_types[it-1]) && (n_pos_types[it] == ACTIVE)/*&& (it != 0)*/){
+               cout << it-1 << " " << it << "\n";
+                for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                    for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
+                        SIGNAL[it3][it2] = new_npos[it]+1;
+                    }
+                }
+                sxcoord = sxcoord + 54;
+            } else if((global[new_npos[it]].name != global[new_npos[it-1]].name) && (n_pos_types[it] == n_pos_types[it-1])/*&& (it != 0)*/){
+                cout << it-1 << " " << it << "\n";
+                sxcoord = sxcoord+54;
+                for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                    for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
+                        SIGNAL[it3][it2] = new_npos[it]+1;
+                    }
+                }
+                sxcoord = sxcoord + 54;
+            }
+    }
+
+    
+    cout << "SIGNALS\n\n\n";    
+    for(int it=0; it<height; it++){
+        for(int it2=0; it2<width; it2++){
+            cout << SIGNAL[it][it2];
+        }
+        cout << "\n";
+    }   
     
     for(int it=0; it<height; it++){
         for(int it2=0; it2<width; it2++){
@@ -607,7 +745,7 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
                     }
                     for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
                         SDT[yc][xc] = 1;
-                        SIGNAL[yc][xc] = p_pos[it];
+                        //SIGNAL[yc][xc] = p_pos[it] +49;
                     }                  
                 }
                 for(int xc=xactcoord; xc<xactcoord+activeInitialWidth; xc++){
@@ -626,7 +764,7 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
                     for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
                         LISD[yc][xc] = 1;
                         SDT[yc][xc] = 1;
-                        SIGNAL[yc][xc] = p_pos[it];                        
+                        //SIGNAL[yc][xc] = static_cast<char>(p_pos[it]);                        
                         //CACTIVE[yc][xc] = 1;
                     }
                 }
@@ -645,7 +783,7 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
                 for(int xc=xcoord; xc<xcoord+lisdWidth; xc++){
                     for(int yc=ycontcoord; yc<ycontcoord+lisdContHeight; yc++){
                         LISD[yc][xc] = 1;
-                        SIGNAL[yc][xc] = p_pos[it];                        
+                        //SIGNAL[yc][xc] = static_cast<char>(p_pos[it]);                      
                     }
                     for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
                         SDT[yc][xc] = 1;
@@ -658,7 +796,7 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
                     for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
                         LISD[yc][xc] = 1;
                         SDT[yc][xc] = 1;
-                         SIGNAL[yc][xc] = p_pos[it];                       
+                        //SIGNAL[yc][xc] = static_cast<char>(p_pos[it]);                       
                         //CACTIVE[yc][xc] = 1;
                     }
                 }
@@ -688,13 +826,7 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
 //            }  
 //            xactcoord = xactcoord+activeInitialWidth; 
     
-    cout << "SIGNALS\n\n\n";    
-        for(int it=0; it<height; it++){
-        for(int it2=0; it2<width; it2++){
-            cout << SIGNAL[it][it2];
-        }
-        cout << "\n";
-    }    
+ 
     cout << "LISD\n\n";
         for(int it=0; it<height; it++){
             for(int it2=0; it2<width; it2++){
