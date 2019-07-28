@@ -658,30 +658,46 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
     }
     cout << "\n";
     
-    int last_ppos, sxcoord = 42, sycoord = 48, sHeigth = 81, actWidth = 24, space = 5;
+    int last_ppos, sxcoord = 42, sycoord = 48, salimcoord = 22, salimHeight = 108, sHeigth = 81, actWidth = 24, space = 5;
     gateWidth = 20;
     for(int it=0; it<new_ppos.size(); it++){
         cout << p_pos_types[it];
             if(p_pos_types[it] == GATE){
                 for(int it2=sxcoord;it2<sxcoord+gateWidth;it2++){
-                    for(int it3=0; it3<height;it3++){
+                    for(int it3=43; it3<height-44;it3++){
                         SIGNAL[it3][it2] = new_ppos[it]+1;
                     }
                 }
                 sxcoord = sxcoord + 25;
             } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] != p_pos_types[it-1]) && (p_pos_types[it] == ACTIVE)/*&& (it != 0)*/){
-               // cout << it-1 << " " << it << "\n";
-                for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
-                    for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
-                        SIGNAL[it3][it2] = new_ppos[it]+1;
+                if(global[new_ppos[it]].name == "VDD") {
+                    for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                        for(int it3=salimcoord; it3<salimcoord+salimHeight;it3++){
+                            SIGNAL[it3][it2] = new_ppos[it]+1;
+                        }
+                    }                    
+                } else {
+                    // cout << it-1 << " " << it << "\n";
+                    for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                        for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
+                            SIGNAL[it3][it2] = new_ppos[it]+1;
+                        }
                     }
                 }
                 sxcoord = sxcoord + 29;
             } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] == p_pos_types[it-1])/*&& (it != 0)*/){
                 sxcoord = sxcoord+79;
-                for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
-                    for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
-                        SIGNAL[it3][it2] = new_ppos[it]+1;
+                if(global[new_ppos[it]].name == "VDD") {
+                    for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                        for(int it3=salimcoord; it3<salimcoord+salimHeight;it3++){
+                            SIGNAL[it3][it2] = new_ppos[it]+1;
+                        }
+                    }                    
+                } else {
+                    for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                        for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
+                            SIGNAL[it3][it2] = new_ppos[it]+1;
+                        }
                     }
                 }
                 sxcoord = sxcoord + 29;
@@ -694,22 +710,62 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
     for(int it=0; it<new_npos.size(); it++){
         if(/*(global[new_npos[it]].name != global[new_npos[it-1]].name) &&*/ (n_pos_types[it] != n_pos_types[it-1]) && (n_pos_types[it] == ACTIVE)/*&& (it != 0)*/){
                cout << it-1 << " " << it << "\n";
-                for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
-                    for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
-                        SIGNAL[it3][it2] = new_npos[it]+1;
+                if(global[new_npos[it]].name == "GND") {
+                    for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                        for(int it3=sycoord; it3<sycoord+salimHeight;it3++){
+                            SIGNAL[it3][it2] = new_npos[it]+1;
+                        }
+                    }                    
+                } else {
+                    for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                        for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
+                            SIGNAL[it3][it2] = new_npos[it]+1;
+                        }
                     }
                 }
                 sxcoord = sxcoord + 54;
             } else if((global[new_npos[it]].name != global[new_npos[it-1]].name) && (n_pos_types[it] == n_pos_types[it-1])/*&& (it != 0)*/){
                 cout << it-1 << " " << it << "\n";
                 sxcoord = sxcoord+54;
-                for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
-                    for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
-                        SIGNAL[it3][it2] = new_npos[it]+1;
+                if(global[new_npos[it]].name == "GND") {
+                    for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                        for(int it3=sycoord; it3<sycoord+salimHeight;it3++){
+                            SIGNAL[it3][it2] = new_npos[it]+1;
+                        }
+                    }                    
+                } else {
+                    for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                        for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
+                            SIGNAL[it3][it2] = new_npos[it]+1;
+                        }
+                    }
+                sxcoord = sxcoord + 54;
+                }
+            }
+    }
+
+    for(int it=0; it<new_ppos.size(); it++){
+        if(global[new_ppos[it]].name == "VDD"){
+            for(int it2=0; it2<height; it2++){
+                for(int it3=0; it3<width; it3++){
+                    if((it2 >= 13) && (it2 <= 30)){
+                        SIGNAL[it2][it3] = new_ppos[it]+1;
                     }
                 }
-                sxcoord = sxcoord + 54;
-            }
+            }            
+        }
+    }
+    
+    for(int it=0; it<new_npos.size(); it++){
+        if(global[new_npos[it]].name == "GND"){
+            for(int it2=0; it2<height; it2++){
+                for(int it3=0; it3<width; it3++){
+                    if((it2 >= (height-31)) && (it2 <= (height-14))){
+                        SIGNAL[it2][it3] = new_npos[it]+1;
+                    }
+                }
+            }            
+        }
     }
 
     
@@ -819,14 +875,99 @@ void renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos
         } 
         lastNet = netlist_p[p_pos[it]];  
     }
-//            for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
-//                for(int xc=xactcoord; xc<xactcoord+activeInitialWidth; xc++){
-//                    CACTIVE[yc][xc] = 1;                                          
-//                }
-//            }  
-//            xactcoord = xactcoord+activeInitialWidth; 
+ ///////////////////////////////////////////////////
     
- 
+    //Net lastNet;
+    xcoord = 41, xactcoord = 45, ycoord = 183, ycontcoord = 183, lisdWidth = 24, lisdHeight = 81, lisdContHeight = 108, activeInitialWidth = 16, activeContWidth = 38;
+    for(int it=0; it<n_pos.size(); it++){
+        if(((lastNet.name != netlist_n[n_pos[it]].name) && (netlist_n[n_pos[it]].type == lastNet.type))){ // quebra
+            if(netlist_n[n_pos[it]].name == "GND"){
+                if(it != 0){
+                    xcoord = xcoord+54;
+                    xactcoord = xactcoord+92;
+                }
+                for(int xc=xcoord; xc<xcoord+lisdWidth; xc++){
+                    for(int yc=ycontcoord; yc<ycontcoord+lisdContHeight; yc++){
+                        LISD[yc][xc] = 1;
+                    }
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        SDT[yc][xc] = 1;
+                        //SIGNAL[yc][xc] = p_pos[it] +49;
+                    }                  
+                }
+                for(int xc=xactcoord; xc<xactcoord+activeInitialWidth; xc++){
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        CACTIVE[yc][xc] = 1;
+                    }                 
+                }      
+                xactcoord = xactcoord+activeInitialWidth;
+                xcoord = xcoord+54;
+            } else {
+                if(it != 0){
+                    xcoord = xcoord+54;
+                    xactcoord = xactcoord+92;
+                }
+                for(int xc=xcoord; xc<xcoord+lisdWidth; xc++){
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        LISD[yc][xc] = 1;
+                        SDT[yc][xc] = 1;
+                        //SIGNAL[yc][xc] = static_cast<char>(p_pos[it]);                        
+                        //CACTIVE[yc][xc] = 1;
+                    }
+                }
+                for(int xc=xactcoord; xc<xactcoord+activeInitialWidth; xc++){
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        CACTIVE[yc][xc] = 1;
+                    }                 
+                }      
+                xactcoord = xactcoord+activeInitialWidth;
+                xcoord = xcoord+54;
+            }
+        //} else if (((lastNet.name == netlist_p[p_pos[it]].name) && (netlist_p[p_pos[it]].type == lastNet.type))){
+          //  xcoord = xcoord+30;
+        } else if ((netlist_n[n_pos[it]].type != lastNet.type) && (netlist_n[n_pos[it]].type == ACTIVE)){
+            if(netlist_n[n_pos[it]].name == "GND"){
+                for(int xc=xcoord; xc<xcoord+lisdWidth; xc++){
+                    for(int yc=ycontcoord; yc<ycontcoord+lisdContHeight; yc++){
+                        LISD[yc][xc] = 1;
+                        //SIGNAL[yc][xc] = static_cast<char>(p_pos[it]);                      
+                    }
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        SDT[yc][xc] = 1;
+                        //CACTIVE[yc][xc] = 1;
+                    }
+                }
+                xcoord = xcoord+54;
+            } else {
+                for(int xc=xcoord; xc<xcoord+lisdWidth; xc++){
+                    for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                        LISD[yc][xc] = 1;
+                        SDT[yc][xc] = 1;
+                        //SIGNAL[yc][xc] = static_cast<char>(p_pos[it]);                       
+                        //CACTIVE[yc][xc] = 1;
+                    }
+                }
+                xcoord = xcoord+54;
+            }
+            
+            for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                for(int xc=xactcoord; xc<xactcoord+activeInitialWidth; xc++){
+                    CACTIVE[yc][xc] = 1;                                          
+                }
+            }
+                xactcoord = xactcoord+activeInitialWidth;            
+        } else if ((netlist_n[n_pos[it]].type != lastNet.type) && (netlist_n[n_pos[it]].type == GATE)){
+                        for(int yc=ycoord; yc<ycoord+lisdHeight; yc++){
+                for(int xc=xactcoord; xc<xactcoord+activeContWidth; xc++){
+                    CACTIVE[yc][xc] = 1;                                          
+                }             
+            }  
+                xactcoord = xactcoord+activeContWidth;   
+        } 
+        lastNet = netlist_n[n_pos[it]];  
+    }
+    
+ //////////////////////////////////////////////////////////////
     cout << "LISD\n\n";
         for(int it=0; it<height; it++){
             for(int it2=0; it2<width; it2++){
