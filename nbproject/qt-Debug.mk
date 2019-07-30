@@ -17,7 +17,7 @@ CXX           = g++
 DEFINES       = -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -W -D_REENTRANT -fPIC $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++11 -Wall -W -D_REENTRANT -fPIC $(DEFINES)
-INCPATH       = -Inbproject -I. -isystem /usr/include/opencv4/ -isystem /usr/include/qt -isystem /usr/include/qt/QtWidgets -isystem /usr/include/qt/QtGui -isystem /usr/include/qt/QtCore -I. -isystem /usr/include/libdrm -I/usr/lib/qt/mkspecs/linux-g++
+INCPATH       = -Inbproject -I. -isystem /usr/local/include/opencv4 -isystem /usr/include/opencv4 -isystem /usr/include/qt -isystem /usr/include/qt/QtWidgets -isystem /usr/include/qt/QtGui -isystem /usr/include/qt/QtCore -I. -isystem /usr/include/libdrm -I/usr/lib/qt/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -40,7 +40,7 @@ DISTNAME      = MIC631.0.0
 DISTDIR = /home/bar/NetBeansProjects/MIC63/build/Debug/GNU-Linux/MIC631.0.0
 LINK          = g++
 LFLAGS        = 
-LIBS          = $(SUBLIBS) /usr/lib/libQt5Widgets.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Core.so /usr/lib/libGL.so -lpthread   
+LIBS          = $(SUBLIBS) -Wl,-rpath,/usr/local/include/opencv4 -lopencv_gapi -lopencv_stitching -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dnn_objdetect -lopencv_dpm -lopencv_face -lopencv_freetype -lopencv_fuzzy -lopencv_hdf -lopencv_hfs -lopencv_img_hash -lopencv_line_descriptor -lopencv_quality -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_superres -lopencv_optflow -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_text -lopencv_dnn -lopencv_plot -lopencv_videostab -lopencv_video -lopencv_viz -lopencv_xfeatures2d -lopencv_shape -lopencv_ml -lopencv_ximgproc -lopencv_xobjdetect -lopencv_objdetect -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_imgcodecs -lopencv_flann -lopencv_xphoto -lopencv_photo -lopencv_imgproc -lopencv_core /usr/lib/libQt5Widgets.so /usr/lib/libQt5Gui.so /usr/lib/libQt5Core.so /usr/lib/libGL.so -lpthread   
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -56,12 +56,14 @@ SOURCES       = grapher.cpp \
 		main.cpp \
 		parser.cpp \
 		placement.cpp \
-		stack.cpp 
+		stack.cpp \
+		view.cpp 
 OBJECTS       = build/Debug/GNU-Linux/grapher.o \
 		build/Debug/GNU-Linux/main.o \
 		build/Debug/GNU-Linux/parser.o \
 		build/Debug/GNU-Linux/placement.o \
-		build/Debug/GNU-Linux/stack.o
+		build/Debug/GNU-Linux/stack.o \
+		build/Debug/GNU-Linux/view.o
 DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/common/unix.conf \
 		/usr/lib/qt/mkspecs/common/linux.conf \
@@ -173,6 +175,7 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt/mkspecs/features/default_pre.prf \
 		/usr/lib/qt/mkspecs/features/resolve_config.prf \
 		/usr/lib/qt/mkspecs/features/default_post.prf \
+		/usr/lib/qt/mkspecs/features/link_pkgconfig.prf \
 		/usr/lib/qt/mkspecs/features/warn_on.prf \
 		/usr/lib/qt/mkspecs/features/qt.prf \
 		/usr/lib/qt/mkspecs/features/resources.prf \
@@ -190,11 +193,13 @@ DIST          = /usr/lib/qt/mkspecs/features/spec_pre.prf \
 		grapher.h \
 		parser.h \
 		placement.h \
-		stack.h grapher.cpp \
+		stack.h \
+		view.h grapher.cpp \
 		main.cpp \
 		parser.cpp \
 		placement.cpp \
-		stack.cpp
+		stack.cpp \
+		view.cpp
 QMAKE_TARGET  = MIC63
 DESTDIR       = dist/Debug/GNU-Linux/
 TARGET        = dist/Debug/GNU-Linux/MIC63
@@ -318,6 +323,7 @@ qttmp-Debug.mk: nbproject/qt-Debug.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf 
 		/usr/lib/qt/mkspecs/features/default_pre.prf \
 		/usr/lib/qt/mkspecs/features/resolve_config.prf \
 		/usr/lib/qt/mkspecs/features/default_post.prf \
+		/usr/lib/qt/mkspecs/features/link_pkgconfig.prf \
 		/usr/lib/qt/mkspecs/features/warn_on.prf \
 		/usr/lib/qt/mkspecs/features/qt.prf \
 		/usr/lib/qt/mkspecs/features/resources.prf \
@@ -444,6 +450,7 @@ qttmp-Debug.mk: nbproject/qt-Debug.pro /usr/lib/qt/mkspecs/linux-g++/qmake.conf 
 /usr/lib/qt/mkspecs/features/default_pre.prf:
 /usr/lib/qt/mkspecs/features/resolve_config.prf:
 /usr/lib/qt/mkspecs/features/default_post.prf:
+/usr/lib/qt/mkspecs/features/link_pkgconfig.prf:
 /usr/lib/qt/mkspecs/features/warn_on.prf:
 /usr/lib/qt/mkspecs/features/qt.prf:
 /usr/lib/qt/mkspecs/features/resources.prf:
@@ -473,8 +480,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents circuit.h grapher.h parser.h placement.h stack.h $(DISTDIR)/
-	$(COPY_FILE) --parents grapher.cpp main.cpp parser.cpp placement.cpp stack.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents circuit.h grapher.h parser.h placement.h stack.h view.h $(DISTDIR)/
+	$(COPY_FILE) --parents grapher.cpp main.cpp parser.cpp placement.cpp stack.cpp view.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -532,7 +539,8 @@ build/Debug/GNU-Linux/main.o: main.cpp parser.h \
 		circuit.h \
 		placement.h \
 		grapher.h \
-		stack.h
+		stack.h \
+		view.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/Debug/GNU-Linux/main.o main.cpp
 
 build/Debug/GNU-Linux/parser.o: parser.cpp parser.h \
@@ -542,7 +550,8 @@ build/Debug/GNU-Linux/parser.o: parser.cpp parser.h \
 build/Debug/GNU-Linux/placement.o: placement.cpp parser.h \
 		circuit.h \
 		grapher.h \
-		stack.h
+		stack.h \
+		view.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/Debug/GNU-Linux/placement.o placement.cpp
 
 build/Debug/GNU-Linux/stack.o: stack.cpp parser.h \
@@ -550,6 +559,13 @@ build/Debug/GNU-Linux/stack.o: stack.cpp parser.h \
 		stack.h \
 		grapher.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/Debug/GNU-Linux/stack.o stack.cpp
+
+build/Debug/GNU-Linux/view.o: view.cpp view.h \
+		parser.h \
+		circuit.h \
+		grapher.h \
+		stack.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o build/Debug/GNU-Linux/view.o view.cpp
 
 ####### Install
 

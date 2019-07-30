@@ -5,11 +5,11 @@ DESTDIR = dist/Debug/GNU-Linux
 TARGET = MIC63
 VERSION = 1.0.0
 CONFIG -= debug_and_release app_bundle lib_bundle
-CONFIG += debug 
-PKGCONFIG +=
+CONFIG += link_pkgconfig debug 
+PKGCONFIG += opencv4
 QT = core gui widgets
-SOURCES += grapher.cpp main.cpp parser.cpp placement.cpp stack.cpp
-HEADERS += circuit.h grapher.h parser.h placement.h stack.h
+SOURCES += grapher.cpp main.cpp parser.cpp placement.cpp stack.cpp view.cpp
+HEADERS += circuit.h grapher.h parser.h placement.h stack.h view.h
 FORMS +=
 RESOURCES +=
 TRANSLATIONS +=
@@ -20,8 +20,8 @@ UI_DIR =
 QMAKE_CC = gcc
 QMAKE_CXX = g++
 DEFINES += 
-INCLUDEPATH += /usr/include/opencv4/ 
-LIBS += 
+INCLUDEPATH += /usr/local/include/opencv4 
+LIBS += -Wl,-rpath,/usr/local/include/opencv4 
 equals(QT_MAJOR_VERSION, 4) {
 QMAKE_CXXFLAGS += -std=c++11
 }

@@ -5,14 +5,14 @@
  */
 
 /* 
- * File:   placement.h
+ * File:   view.h
  * Author: bar
  *
- * Created on May 18, 2019, 7:50 PM
+ * Created on July 29, 2019, 10:12 PM
  */
 
-#ifndef PLACEMENT_H
-#define PLACEMENT_H
+#ifndef VIEW_H
+#define VIEW_H
 
 #include <fstream>
 #include <iomanip>
@@ -26,10 +26,9 @@
 #include <iterator>
 #include "grapher.h"
 #include "stack.h"
-#include "view.h"
+#include <unistd.h>
 
-void place(string fileName);
+int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos, vector<Net> netlist_n, int nfin, int ntracks);
 
-
-#endif /* PLACEMENT_H */
+#endif /* VIEW_H */
 
