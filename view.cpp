@@ -192,6 +192,8 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
     int last_ppos, sxcoord = 42, sycoord = 48, salimcoord = 22, salimHeight = 108, sHeigth = 81, actWidth = 24, space = 5;
     gateWidth = 20;
     for(int it=0; it<new_ppos.size(); it++){
+        cout << "testeXXX\n";
+        cout << "it: " << global[new_ppos[it]].name << "\n";
         cout << p_pos_types[it];
             if(p_pos_types[it] == GATE){
                 for(int it2=sxcoord;it2<sxcoord+gateWidth;it2++){
@@ -200,8 +202,10 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                     }
                 }
                 sxcoord = sxcoord + 25;
-            } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] != p_pos_types[it-1]) && (p_pos_types[it] == ACTIVE)/*&& (it != 0)*/){
+            } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] != p_pos_types[it-1]) && (p_pos_types[it] == ACTIVE) && (it != 0)){
+                
                 if(global[new_ppos[it]].name == "VDD") {
+                    cout << "teste1\n";
                     for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
                         for(int it3=salimcoord; it3<salimcoord+salimHeight;it3++){
                             SIGNAL[it3][it2] = new_ppos[it]+1;
@@ -216,8 +220,23 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                     }
                 }
                 sxcoord = sxcoord + 29;
-            } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] == p_pos_types[it-1])/*&& (it != 0)*/){
+            } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] == p_pos_types[it-1]) && (it != 0)){
                 sxcoord = sxcoord+79;
+                if(global[new_ppos[it]].name == "VDD") {
+                    for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                        for(int it3=salimcoord; it3<salimcoord+salimHeight;it3++){
+                            SIGNAL[it3][it2] = new_ppos[it]+1;
+                        }
+                    }                    
+                } else {
+                    for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
+                        for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
+                            SIGNAL[it3][it2] = new_ppos[it]+1;
+                        }
+                    }
+                }
+                sxcoord = sxcoord + 29;
+            } else if(it == 0){
                 if(global[new_ppos[it]].name == "VDD") {
                     for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
                         for(int it3=salimcoord; it3<salimcoord+salimHeight;it3++){
