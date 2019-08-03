@@ -30,5 +30,15 @@
 
 int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos, vector<Net> netlist_n, int nfin, int ntracks);
 
+typedef pair<int, int> coord;
+
+struct point2{
+    point2(int a, int b){ s.first = a; s.second = b;}
+    coord s;
+};
+
+struct signal{
+    vector <point2> instances;
+};
 #endif /* VIEW_H */
 

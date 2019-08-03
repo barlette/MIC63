@@ -30,6 +30,154 @@ using namespace std;
 
 int height, width;
 
+class point {
+public:
+    point( int a = 0, int b = 0 ) { x = a; y = b; }
+    bool operator ==( const point& o ) { return o.x == x && o.y == y; }
+    point operator +( const point& o ) { return point( o.x + x, o.y + y ); }
+    int x, y;
+};
+ 
+
+ 
+class node {
+public:
+    bool operator == (const node& o ) { return pos == o.pos; }
+    bool operator == (const point& o ) { return pos == o; }
+    point pos, parent;
+    int f, g, h;
+};
+
+//class map {
+//public:
+//    int largura, altura;
+//    map(coord s, coord f, int Height, int Width) {
+//        int temp[Height][Width];
+//            for(int it = 0; it<Height; it++){
+//                for(int it2=0;it<Width;it2++){
+//                    if(it2 == s.first && it == s.second){
+//                        temp[it][it2] = 1;
+//                    } else if (it2 == f.first && it == f.second){
+//                        temp[it][it2] = 1;                        
+//                    }
+//                }
+//            }
+//        
+//        largura = Width;
+//        altura = Height;
+//        //m = temp;
+////        for( int r = 0; r < altura; r++ )
+////            for( int s = 0; s < largura; s++ )
+////                m[s][r] = t[r][s];
+//    }
+//    vector < vector <int>> m;
+//    int operator() ( int x, int y ) { return m[x][y]; }
+//    
+//};
+//
+//class aStar {
+//public:
+//    
+//    aStar() {
+//        neighbours[0] = point( -1, -1 ); neighbours[1] = point(  1, -1 );
+//        neighbours[2] = point( -1,  1 ); neighbours[3] = point(  1,  1 );
+//        neighbours[4] = point(  0, -1 ); neighbours[5] = point( -1,  0 );
+//        neighbours[6] = point(  0,  1 ); neighbours[7] = point(  1,  0 );
+//    }
+// 
+//    int calcDist( point& p ){
+//        // need a better heuristic
+//        int x = end.x - p.x, y = end.y - p.y;
+//        return( x * x + y * y );
+//    }
+//    
+//    bool isValid(point& p, int Width, int Height){
+//        return (p.x >-1 && p.y > -1 && p.x < Width && p.y < Height);
+//    }
+//    
+//    bool existPoint( point& p, int cost ) {
+//        std::list<node>::iterator i;
+//        i = std::find( closed.begin(), closed.end(), p );
+//        if( i != closed.end() ) {
+//            if( ( *i ).cost + ( *i ).dist < cost ) return true;
+//            else { closed.erase( i ); return false; }
+//        }
+//        i = std::find( open.begin(), open.end(), p );
+//        if( i != open.end() ) {
+//            if( ( *i ).cost + ( *i ).dist < cost ) return true;
+//            else { open.erase( i ); return false; }
+//        }
+//        return false;
+//    }
+// 
+//    bool fillOpen( node& n ) {
+//        int stepCost, nc, dist;
+//        point neighbour;
+// 
+//        for( int x = 0; x < 8; x++ ) {
+//            // one can make diagonals have different cost
+//            stepCost = x < 4 ? 1 : 1;
+//            neighbour = n.pos + neighbours[x];
+//            if( neighbour == end ) return true;
+// 
+//            if(isValid( neighbour, m.largura, m.altura ) && m( neighbour.x, neighbour.y ) != 1 ) {
+//                nc = stepCost + n.cost;
+//                dist = calcDist( neighbour );
+//                if( !existPoint( neighbour, nc + dist ) ) {
+//                    node m;
+//                    m.cost = nc; m.dist = dist;
+//                    m.pos = neighbour; 
+//                    m.parent = n.pos;
+//                    open.push_back( m );
+//                }
+//            }
+//        }
+//        return false;
+//    }
+// 
+//    bool search( point& s, point& e, map& mp ) {
+//        node n; end = e; start = s; m = mp;
+//        n.cost = 0; n.pos = s; n.parent = 0; n.dist = calcDist( s ); 
+//        open.push_back( n );
+//        while( !open.empty() ) {
+//            //open.sort();
+//            node n = open.front();
+//            open.pop_front();
+//            closed.push_back( n );
+//            if( fillOpen( n ) ) return true;
+//        }
+//        return false;
+//    }
+// 
+//    int path( std::list<point>& path ) {
+//        path.push_front( end );
+//        int cost = 1 + closed.back().cost; 
+//        path.push_front( closed.back().pos );
+//        point parent = closed.back().parent;
+// 
+//        for( std::list<node>::reverse_iterator i = closed.rbegin(); i != closed.rend(); i++ ) {
+//            if( ( *i ).pos == parent && !( ( *i ).pos == start ) ) {
+//                path.push_front( ( *i ).pos );
+//                parent = ( *i ).parent;
+//            }
+//        }
+//        path.push_front( start );
+//        return cost;
+//    }
+// 
+//    map m; 
+//    point end, start;
+//    point neighbours[8];
+//    std::list<node> open;
+//    std::list<node> closed;
+//};    
+
+int calcDist( point& p, point &end ){
+    // need a better heuristic
+    int x = end.x - p.x, y = end.y - p.y;
+    return( x * x + y * y );
+}
+    
 int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos, vector<Net> netlist_n, int nfin, int ntracks){
 
     
@@ -189,7 +337,9 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
     }
     cout << "\n";
     
-    int last_ppos, sxcoord = 42, sycoord = 48, salimcoord = 22, salimHeight = 108, sHeigth = 81, actWidth = 24, space = 5;
+    signal mSignal[global.size()];
+    
+    int last_ppos, sxcoord = 42, sycoord = 48, salimcoord = 22, salimHeight = 108, sHeigth = 81, actWidth = 24, space = 5, ligcontxcoord = 70, ligcontycoord = 145, ligContWidth = 22, ligContHeight = 20;
     gateWidth = 20;
     for(int it=0; it<new_ppos.size(); it++){
         cout << "testeXXX\n";
@@ -201,8 +351,18 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                         SIGNAL[it3][it2] = new_ppos[it]+1;
                     }
                 }
+                for(int it2 = ligcontxcoord; it2 <= ligcontxcoord+ligContWidth; it2++){
+                    for(int it3=ligcontycoord; it3 <= ligcontycoord+ligContHeight; it3++){
+                        LIG[it3][it2] = 1;
+                    }
+                }
+                point2 temp((ligcontxcoord+(ligContWidth/2)), (ligcontycoord+(ligContHeight/2)));
+                mSignal[new_ppos[it]].instances.push_back(temp);
+                ligcontxcoord = ligcontxcoord + 54;
                 sxcoord = sxcoord + 25;
             } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] != p_pos_types[it-1]) && (p_pos_types[it] == ACTIVE) && (it != 0)){
+                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                mSignal[new_ppos[it]].instances.push_back(temp);
                 
                 if(global[new_ppos[it]].name == "VDD") {
                     cout << "teste1\n";
@@ -221,6 +381,8 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                 }
                 sxcoord = sxcoord + 29;
             } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] == p_pos_types[it-1]) && (it != 0)){
+                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                mSignal[new_ppos[it]].instances.push_back(temp);
                 sxcoord = sxcoord+79;
                 if(global[new_ppos[it]].name == "VDD") {
                     for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
@@ -237,6 +399,8 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                 }
                 sxcoord = sxcoord + 29;
             } else if(it == 0){
+                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                mSignal[new_ppos[it]].instances.push_back(temp);
                 if(global[new_ppos[it]].name == "VDD") {
                     for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
                         for(int it3=salimcoord; it3<salimcoord+salimHeight;it3++){
@@ -273,8 +437,12 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                         }
                     }
                 }
+                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                mSignal[new_npos[it]].instances.push_back(temp);
                 sxcoord = sxcoord + 54;
             } else if((global[new_npos[it]].name != global[new_npos[it-1]].name) && (n_pos_types[it] == n_pos_types[it-1])/*&& (it != 0)*/){
+                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                mSignal[new_npos[it]].instances.push_back(temp);
                 cout << it-1 << " " << it << "\n";
                 sxcoord = sxcoord+54;
                 if(global[new_npos[it]].name == "GND") {
@@ -686,5 +854,114 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
     //imshow("A_good_name", img);
     //waitKey(1000); //wait infinite time for a keypress
     //destroyWindow("A_good_name"); 
+    
+    //ROTEAMENTO
+    
+    int POINTS[height][width];
+    
+    
+    
+    for(int it=0; it<global.size();it++){
+        for(int it2=0; it2<mSignal[it].instances.size();it2++){
+            cout << it << "-> x: " << mSignal[it].instances[it2].s.first << "| y: " << mSignal[it].instances[it2].s.second << "\n";
+        }
+    }
+    
+    
+    //select first route
+    int temp_distance=0, first=0, distance, s, f, o;
+    
+    
+    for(int it=0; it<global.size();it++){
+        if(mSignal[it].instances.size() > 1){
+            for(int it2=0; it2<mSignal[it].instances.size();it2++){
+                for(int it3=0; it3<mSignal[it].instances.size();it3++){
+                    temp_distance = pow(abs(mSignal[it].instances[it2].s.first - mSignal[it].instances[it3].s.first),2)+pow(abs(mSignal[it].instances[it2].s.second - mSignal[it].instances[it3].s.second),2);
+                    cout << temp_distance << "\n";
+                    if((first == 0) && (temp_distance != 0)){
+                        distance = temp_distance;
+                        first = 1;
+                        s = it2;
+                        f = it3;
+                        o = it;
+                    } else if ((temp_distance < distance) && (temp_distance != 0)){
+                        distance = temp_distance;
+                        s = it2;
+                        f = it3;
+                        o = it;
+                    }
+                }
+            }
+        }
+    }
+    
+    
+
+    
+    
+
+    
+    int stepCost, nc, dist;
+    point neighbour;
+    point neighbours[8];
+    neighbours[0] = point( -1, -1 ); 
+    neighbours[1] = point(  1, -1 );
+    neighbours[2] = point( -1,  1 ); 
+    neighbours[3] = point(  1,  1 );
+    neighbours[4] = point(  0, -1 ); 
+    neighbours[5] = point( -1,  0 );
+    neighbours[6] = point(  0,  1 ); 
+    neighbours[7] = point(  1,  0 );
+    
+    bool resultSearch;
+    bool resultFillOpen;
+    
+    //node start.pos(mSignal[o].instances[s].s.first, mSignal[o].instances[s].s.second);
+    //node finish.pos(mSignal[o].instances[f].s.first, mSignal[o].instances[f].s.second);
+    node start, finish;
+    start.pos.x = mSignal[o].instances[s].s.first;
+    start.pos.y = mSignal[o].instances[s].s.second;
+    
+    finish.pos.x = mSignal[o].instances[f].s.first;
+    finish.pos.y = mSignal[o].instances[f].s.second;
+    cout << "start x: " << start.pos.x << " start y: " << start.pos.y << "\n"; 
+    cout << "finish x: " << finish.pos.x << " finish y: " << finish.pos.y << "\n"; 
+    
+    start.f = start.g = start.h = 0;
+    finish.f = finish.g = finish.h = 0;
+    
+    std::list<node> open, closed;
+    
+    open.push_back(start);
+    node current_node;
+    node temp;
+    int current_index;
+    
+    while(!open.empty()){
+       current_node = open.front();
+       current_index = 0;
+       std::list<node>::iterator it;
+       for(it=open.begin();it<open.end();it++){
+           if(it->f < current_node.f){
+               current_node = it;
+               current_index = it - open.begin();
+           }
+       }
+       
+       open.erase(std::find(open.begin(), open.end(), current_node));
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     return 0;
 }
