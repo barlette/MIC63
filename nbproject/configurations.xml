@@ -53,12 +53,12 @@
         <ccTool>
           <standard>8</standard>
           <incDir>
-            <pElem>/usr/local/include/opencv4</pElem>
+            <pElem>/usr/include/opencv4</pElem>
           </incDir>
         </ccTool>
         <linkerTool>
           <linkerDynSerch>
-            <pElem>/usr/local/include/opencv4</pElem>
+            <pElem>/usr/include/opencv4</pElem>
           </linkerDynSerch>
           <linkerLibItems>
             <linkerOptionItem>`pkg-config --libs opencv4`</linkerOptionItem>

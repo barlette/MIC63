@@ -20,8 +20,8 @@ UI_DIR =
 QMAKE_CC = gcc
 QMAKE_CXX = g++
 DEFINES += 
-INCLUDEPATH += /usr/local/include/opencv4 
-LIBS += -Wl,-rpath,/usr/local/include/opencv4 
+INCLUDEPATH += /usr/include/opencv4 
+LIBS += -Wl,-rpath,/usr/include/opencv4 
 equals(QT_MAJOR_VERSION, 4) {
 QMAKE_CXXFLAGS += -std=c++11
 }

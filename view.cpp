@@ -936,19 +936,79 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
     node current_node;
     node temp;
     int current_index;
-    
+    int temp_it=0;
     while(!open.empty()){
        current_node = open.front();
        current_index = 0;
-       std::list<node>::iterator it;
-       for(it=open.begin();it<open.end();it++){
-           if(it->f < current_node.f){
-               current_node = it;
-               current_index = it - open.begin();
+       std::list<node>::iterator it2;
+       
+       temp_it=0;
+       for(it2=open.begin();it2 != open.end();it2++){
+           if(it2->f < current_node.f){
+               current_node.f = it2->f;
+               current_node.g = it2->g;
+               current_node.h = it2->h;
+               current_node.parent = it2->parent;
+               current_node.pos = it2->pos;
+               current_index = temp_it;
            }
+       temp_it++;
        }
        
+       
        open.erase(std::find(open.begin(), open.end(), current_node));
+       closed.push_back(current_node);
+       
+       if(current_node == finish){
+           list<point> path;
+           point current = current_node.pos;
+           while ((current.x != start.pos.x) && (current.y != start.pos.y)){
+               path.push_back(current);
+               current = current_node.parent;
+           }
+           
+       } else {
+           vector<point> surr;
+           point temp;
+           temp.x = 0;
+           temp.y = -1;
+           surr.push_back(temp);
+           temp.x = 0;
+           temp.y = 1;
+           surr.push_back(temp);
+           temp.x = -1;
+           temp.y = 0;
+           surr.push_back(temp);
+           temp.x = 1;
+           temp.y = 0;
+           surr.push_back(temp);
+           
+           vector<point> node_position;
+           list<node> children;
+           node temp_node;
+           for(int it=0;it<surr.size();it++){
+               temp.x = surr[it].x + current_node.pos.x;
+               temp.y = surr[it].y + current_node.pos.y;
+               temp_node.pos.x = temp.x;
+               temp_node.pos.y = temp.y;
+               temp_node.parent.x = current_node.pos.x;
+               temp_node.parent.y = current_node.pos.y;
+               children.push_back(temp_node);
+               //node_position.push_back(temp);   
+           }
+           for(int it=0;it<children.size();it++){
+               for(int it2=0;it2<closed.size();it2++){
+                   if(children[it] == closed[it2]){
+                       continue;
+                   }
+               }
+           
+               children[it].
+           }
+           
+           
+       }
+       
     }
     
     
