@@ -44,133 +44,10 @@ class node {
 public:
     bool operator == (const node& o ) { return pos == o.pos; }
     bool operator == (const point& o ) { return pos == o; }
+    //bool operator = (const node& o) { pos = o.pos; parent = o.parent; f = o.f; h = o.h; g = o.g; }
     point pos, parent;
     int f, g, h;
 };
-
-//class map {
-//public:
-//    int largura, altura;
-//    map(coord s, coord f, int Height, int Width) {
-//        int temp[Height][Width];
-//            for(int it = 0; it<Height; it++){
-//                for(int it2=0;it<Width;it2++){
-//                    if(it2 == s.first && it == s.second){
-//                        temp[it][it2] = 1;
-//                    } else if (it2 == f.first && it == f.second){
-//                        temp[it][it2] = 1;                        
-//                    }
-//                }
-//            }
-//        
-//        largura = Width;
-//        altura = Height;
-//        //m = temp;
-////        for( int r = 0; r < altura; r++ )
-////            for( int s = 0; s < largura; s++ )
-////                m[s][r] = t[r][s];
-//    }
-//    vector < vector <int>> m;
-//    int operator() ( int x, int y ) { return m[x][y]; }
-//    
-//};
-//
-//class aStar {
-//public:
-//    
-//    aStar() {
-//        neighbours[0] = point( -1, -1 ); neighbours[1] = point(  1, -1 );
-//        neighbours[2] = point( -1,  1 ); neighbours[3] = point(  1,  1 );
-//        neighbours[4] = point(  0, -1 ); neighbours[5] = point( -1,  0 );
-//        neighbours[6] = point(  0,  1 ); neighbours[7] = point(  1,  0 );
-//    }
-// 
-//    int calcDist( point& p ){
-//        // need a better heuristic
-//        int x = end.x - p.x, y = end.y - p.y;
-//        return( x * x + y * y );
-//    }
-//    
-//    bool isValid(point& p, int Width, int Height){
-//        return (p.x >-1 && p.y > -1 && p.x < Width && p.y < Height);
-//    }
-//    
-//    bool existPoint( point& p, int cost ) {
-//        std::list<node>::iterator i;
-//        i = std::find( closed.begin(), closed.end(), p );
-//        if( i != closed.end() ) {
-//            if( ( *i ).cost + ( *i ).dist < cost ) return true;
-//            else { closed.erase( i ); return false; }
-//        }
-//        i = std::find( open.begin(), open.end(), p );
-//        if( i != open.end() ) {
-//            if( ( *i ).cost + ( *i ).dist < cost ) return true;
-//            else { open.erase( i ); return false; }
-//        }
-//        return false;
-//    }
-// 
-//    bool fillOpen( node& n ) {
-//        int stepCost, nc, dist;
-//        point neighbour;
-// 
-//        for( int x = 0; x < 8; x++ ) {
-//            // one can make diagonals have different cost
-//            stepCost = x < 4 ? 1 : 1;
-//            neighbour = n.pos + neighbours[x];
-//            if( neighbour == end ) return true;
-// 
-//            if(isValid( neighbour, m.largura, m.altura ) && m( neighbour.x, neighbour.y ) != 1 ) {
-//                nc = stepCost + n.cost;
-//                dist = calcDist( neighbour );
-//                if( !existPoint( neighbour, nc + dist ) ) {
-//                    node m;
-//                    m.cost = nc; m.dist = dist;
-//                    m.pos = neighbour; 
-//                    m.parent = n.pos;
-//                    open.push_back( m );
-//                }
-//            }
-//        }
-//        return false;
-//    }
-// 
-//    bool search( point& s, point& e, map& mp ) {
-//        node n; end = e; start = s; m = mp;
-//        n.cost = 0; n.pos = s; n.parent = 0; n.dist = calcDist( s ); 
-//        open.push_back( n );
-//        while( !open.empty() ) {
-//            //open.sort();
-//            node n = open.front();
-//            open.pop_front();
-//            closed.push_back( n );
-//            if( fillOpen( n ) ) return true;
-//        }
-//        return false;
-//    }
-// 
-//    int path( std::list<point>& path ) {
-//        path.push_front( end );
-//        int cost = 1 + closed.back().cost; 
-//        path.push_front( closed.back().pos );
-//        point parent = closed.back().parent;
-// 
-//        for( std::list<node>::reverse_iterator i = closed.rbegin(); i != closed.rend(); i++ ) {
-//            if( ( *i ).pos == parent && !( ( *i ).pos == start ) ) {
-//                path.push_front( ( *i ).pos );
-//                parent = ( *i ).parent;
-//            }
-//        }
-//        path.push_front( start );
-//        return cost;
-//    }
-// 
-//    map m; 
-//    point end, start;
-//    point neighbours[8];
-//    std::list<node> open;
-//    std::list<node> closed;
-//};    
 
 int calcDist( point& p, point &end ){
     // need a better heuristic
@@ -729,126 +606,126 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
     
     
     
-    Mat img(height, width, CV_8UC4, Scalar(0,0,0,255));
-    
-
-    
-    if (img.empty()) 
-    {
-        cout << "\n Image not created. You"
-                     " have done something wrong. \n";
-        return -1;    // Unsuccessful.
-    }
-
-//    int     GCUT[height][width]; ok
-//    int     M1[height][width]; ok
-//    int     LIG[height][width]; ok
-//    int     FIN[height][width]; ok
-//    int     CGATE[height][width]; ok
-//    int     LISD[height][width]; ok
-//    int     SDT[height][width]; ok
-//    int     CACTIVE[height][width];
-//    int    SIGNAL[height][width];
-    
-    for(int it=0; it<height; it++){
-        for(int it2=0; it2<width; it2++){
-            if(CGATE[it][it2] == 1){
-                img.at<Vec4b>(it, it2) = Vec4b(0, 0, 255, 100);                
-            }
-            if(GCUT[it][it2] == 1){
-                img.at<Vec4b>(it, it2) = Vec4b(255, 0, 255, 100);                
-            }
-            if(LIG[it][it2] == 1){
-                img.at<Vec4b>(it, it2) = Vec4b(0, 157, 255, 100);                
-            }
-            if(M1[it][it2] == 1){
-                img.at<Vec4b>(it, it2) = Vec4b(255, 0, 0, 100);                
-            } 
-            if(CACTIVE[it][it2] == 1){
-                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 0, 100);                
-            } 
-            if(LISD[it][it2] == 1){
-                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 255, 100);                
-            }  
-            if(SDT[it][it2] == 1){
-                img.at<Vec4b>(it, it2) = Vec4b(255, 255, 255, 50);                
-            }
-            if(FIN[it][it2] == 1){
-                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 0, 100);                
-            }           
-        }
-    }
-    
-    vector <Mat> dst;
-    Mat gate(height, width, CV_8UC4, Scalar(0,0,0,0));
-    Mat gcut(height, width, CV_8UC4, Scalar(0,0,0,0));
-    Mat lig(height, width, CV_8UC4, Scalar(0,0,0,0));
-    Mat m1(height, width, CV_8UC4, Scalar(0,0,0,0));
-    Mat active(height, width, CV_8UC4, Scalar(0,0,0,0));
-    Mat lisd(height, width, CV_8UC4, Scalar(0,0,0,0));
-    Mat sdt(height, width, CV_8UC4, Scalar(0,0,0,0));
-    Mat cfin(height, width, CV_8UC4, Scalar(0,0,0,0));
-    
-    for(int it=0; it<height; it++){
-        for(int it2=0; it2<width; it2++){
-            if(CGATE[it][it2] == 1){
-                gate.at<Vec4b>(it, it2) = Vec4b(0, 0, 255, 255);                
-            }
-            if(GCUT[it][it2] == 1){
-                gcut.at<Vec4b>(it, it2) = Vec4b(255, 0, 255, 255);                
-            }
-            if(LIG[it][it2] == 1){
-                lig.at<Vec4b>(it, it2) = Vec4b(0, 157, 255, 255);                
-            }
-            if(M1[it][it2] == 1){
-                m1.at<Vec4b>(it, it2) = Vec4b(255, 0, 0,255);                
-            } 
-            if(CACTIVE[it][it2] == 1){
-                active.at<Vec4b>(it, it2) = Vec4b(0, 255, 0,255);                
-            } 
-            if(LISD[it][it2] == 1){
-                lisd.at<Vec4b>(it, it2) = Vec4b(0, 255, 255,255);                
-            }  
-            if(SDT[it][it2] == 1){
-                sdt.at<Vec4b>(it, it2) = Vec4b(255, 255, 255,255);                
-            }
-            if(FIN[it][it2] == 1){
-                cfin.at<Vec4b>(it, it2) = Vec4b(0, 255, 0,255);                
-            }           
-        }
-    }
-
-    dst.push_back(gate);
-    dst.push_back(gcut);
-    dst.push_back(lig);
-    dst.push_back(m1);
-    dst.push_back(active);
-    dst.push_back(lisd);    
-    dst.push_back(sdt);
-    dst.push_back(cfin);
-    
-    Mat merged(height, width, CV_8UC4, Scalar(0,0,0,0));
-    
-    merged = dst[0];
-    
-    for(Mat mat : dst){
-        cv::addWeighted(merged, 1, mat, 0.5, 0, merged);
-    }
-    
-    
-    
-    cv::imwrite("layout.png", img);
-    
-    cv::imwrite("gate.png", gate);
-    cv::imwrite("gcut.png", gcut);
-    cv::imwrite("lig.png", lig);
-    cv::imwrite("m1.png", m1);
-    cv::imwrite("active.png", active);
-    cv::imwrite("lisd.png", lisd);
-    cv::imwrite("sdt.png", sdt);
-    cv::imwrite("cfin.png", cfin);
-    
-    cv::imwrite("merged.png", merged);
+//    Mat img(height, width, CV_8UC4, Scalar(0,0,0,255));
+//    
+//
+//    
+//    if (img.empty()) 
+//    {
+//        cout << "\n Image not created. You"
+//                     " have done something wrong. \n";
+//        return -1;    // Unsuccessful.
+//    }
+//
+////    int     GCUT[height][width]; ok
+////    int     M1[height][width]; ok
+////    int     LIG[height][width]; ok
+////    int     FIN[height][width]; ok
+////    int     CGATE[height][width]; ok
+////    int     LISD[height][width]; ok
+////    int     SDT[height][width]; ok
+////    int     CACTIVE[height][width];
+////    int    SIGNAL[height][width];
+//    
+//    for(int it=0; it<height; it++){
+//        for(int it2=0; it2<width; it2++){
+//            if(CGATE[it][it2] == 1){
+//                img.at<Vec4b>(it, it2) = Vec4b(0, 0, 255, 100);                
+//            }
+//            if(GCUT[it][it2] == 1){
+//                img.at<Vec4b>(it, it2) = Vec4b(255, 0, 255, 100);                
+//            }
+//            if(LIG[it][it2] == 1){
+//                img.at<Vec4b>(it, it2) = Vec4b(0, 157, 255, 100);                
+//            }
+//            if(M1[it][it2] == 1){
+//                img.at<Vec4b>(it, it2) = Vec4b(255, 0, 0, 100);                
+//            } 
+//            if(CACTIVE[it][it2] == 1){
+//                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 0, 100);                
+//            } 
+//            if(LISD[it][it2] == 1){
+//                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 255, 100);                
+//            }  
+//            if(SDT[it][it2] == 1){
+//                img.at<Vec4b>(it, it2) = Vec4b(255, 255, 255, 50);                
+//            }
+//            if(FIN[it][it2] == 1){
+//                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 0, 100);                
+//            }           
+//        }
+//    }
+//    
+//    vector <Mat> dst;
+//    Mat gate(height, width, CV_8UC4, Scalar(0,0,0,0));
+//    Mat gcut(height, width, CV_8UC4, Scalar(0,0,0,0));
+//    Mat lig(height, width, CV_8UC4, Scalar(0,0,0,0));
+//    Mat m1(height, width, CV_8UC4, Scalar(0,0,0,0));
+//    Mat active(height, width, CV_8UC4, Scalar(0,0,0,0));
+//    Mat lisd(height, width, CV_8UC4, Scalar(0,0,0,0));
+//    Mat sdt(height, width, CV_8UC4, Scalar(0,0,0,0));
+//    Mat cfin(height, width, CV_8UC4, Scalar(0,0,0,0));
+//    
+//    for(int it=0; it<height; it++){
+//        for(int it2=0; it2<width; it2++){
+//            if(CGATE[it][it2] == 1){
+//                gate.at<Vec4b>(it, it2) = Vec4b(0, 0, 255, 255);                
+//            }
+//            if(GCUT[it][it2] == 1){
+//                gcut.at<Vec4b>(it, it2) = Vec4b(255, 0, 255, 255);                
+//            }
+//            if(LIG[it][it2] == 1){
+//                lig.at<Vec4b>(it, it2) = Vec4b(0, 157, 255, 255);                
+//            }
+//            if(M1[it][it2] == 1){
+//                m1.at<Vec4b>(it, it2) = Vec4b(255, 0, 0,255);                
+//            } 
+//            if(CACTIVE[it][it2] == 1){
+//                active.at<Vec4b>(it, it2) = Vec4b(0, 255, 0,255);                
+//            } 
+//            if(LISD[it][it2] == 1){
+//                lisd.at<Vec4b>(it, it2) = Vec4b(0, 255, 255,255);                
+//            }  
+//            if(SDT[it][it2] == 1){
+//                sdt.at<Vec4b>(it, it2) = Vec4b(255, 255, 255,255);                
+//            }
+//            if(FIN[it][it2] == 1){
+//                cfin.at<Vec4b>(it, it2) = Vec4b(0, 255, 0,255);                
+//            }           
+//        }
+//    }
+//
+//    dst.push_back(gate);
+//    dst.push_back(gcut);
+//    dst.push_back(lig);
+//    dst.push_back(m1);
+//    dst.push_back(active);
+//    dst.push_back(lisd);    
+//    dst.push_back(sdt);
+//    dst.push_back(cfin);
+//    
+//    Mat merged(height, width, CV_8UC4, Scalar(0,0,0,0));
+//    
+//    merged = dst[0];
+//    
+//    for(Mat mat : dst){
+//        cv::addWeighted(merged, 1, mat, 0.5, 0, merged);
+//    }
+//    
+//    
+//    
+//    cv::imwrite("layout.png", img);
+//    
+//    cv::imwrite("gate.png", gate);
+//    cv::imwrite("gcut.png", gcut);
+//    cv::imwrite("lig.png", lig);
+//    cv::imwrite("m1.png", m1);
+//    cv::imwrite("active.png", active);
+//    cv::imwrite("lisd.png", lisd);
+//    cv::imwrite("sdt.png", sdt);
+//    cv::imwrite("cfin.png", cfin);
+//    
+//    cv::imwrite("merged.png", merged);
     
     //namedWindow("A_good_name");    
     //imshow("A_good_name", img);
@@ -868,7 +745,7 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
     }
     
     
-    //select first route
+//    //select first route
     int temp_distance=0, first=0, distance, s, f, o;
     
     
@@ -937,8 +814,14 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
     node temp;
     int current_index;
     int temp_it=0;
-    while(!open.empty()){
-       current_node = open.front();
+    list<point> path;
+    int found_path =0;
+    while(!open.empty() && !found_path){
+       current_node.f = open.begin()->f;
+       current_node.g = open.begin()->g;
+       current_node.h = open.begin()->h;
+       current_node.pos = open.begin()->pos;
+       current_node.parent = open.begin()->parent;
        current_index = 0;
        std::list<node>::iterator it2;
        
@@ -950,24 +833,40 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                current_node.h = it2->h;
                current_node.parent = it2->parent;
                current_node.pos = it2->pos;
+               
                current_index = temp_it;
            }
        temp_it++;
        }
        
        
-       open.erase(std::find(open.begin(), open.end(), current_node));
+       //open.erase(std::find(open.begin(), open.end(), current_node));
+       open.remove(current_node);
        closed.push_back(current_node);
-       
+       point parent;
        if(current_node == finish){
-           list<point> path;
-           point current = current_node.pos;
-           while ((current.x != start.pos.x) && (current.y != start.pos.y)){
-               path.push_back(current);
-               current = current_node.parent;
+           cout << "Encontrou um caminho. current pos -> x: " << current_node.pos.x << " y: " << current_node.pos.y;
+           
+           parent = current_node.pos;
+           cout << "222 x: " << start.pos.x << " y: " << start.pos.y << "\n";
+           
+           while ((parent.x != start.pos.x) || (parent.y != start.pos.y)){
+               cout << "Construindo path\n";
+               path.push_back(parent);
+               parent = current_node.parent;
+               
+               for(std::list<node>::iterator it=closed.begin();it!=closed.end();it++){
+                   if((it->pos.x == parent.x) && (it->pos.y == parent.y)){
+                       current_node = *it;
+                   }
+               }
+               cout << "Parent pos -> x: " << parent.x << " y: " << parent.y;
            }
+           //break;
+           found_path = 1;
            
        } else {
+           cout << "else clausule\n";
            vector<point> surr;
            point temp;
            temp.x = 0;
@@ -994,28 +893,174 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                temp_node.parent.x = current_node.pos.x;
                temp_node.parent.y = current_node.pos.y;
                children.push_back(temp_node);
+               cout << "Novo filho -> x:  " << temp_node.pos.x << " y: " << temp_node.pos.y << "\n";
                //node_position.push_back(temp);   
            }
-           for(int it=0;it<children.size();it++){
-               for(int it2=0;it2<closed.size();it2++){
-                   if(children[it] == closed[it2]){
+           std::list<node>::iterator curr_children;
+           std::list<node>::iterator curr_closed;
+           for(curr_children=children.begin();curr_children!=children.end();curr_children++){
+               for(curr_closed=closed.begin();curr_closed!=closed.end();curr_closed++){
+                   if(curr_children == curr_closed){
                        continue;
                    }
                }
+               
+               curr_children->g = current_node.g + 1;
+               curr_children->h = (pow(curr_children->pos.x - finish.pos.x,2) + pow(curr_children->pos.y - finish.pos.y,2));
+               curr_children->f = curr_children->g + curr_children->h;
            
-               children[it].
+               std::list<node>::iterator curr_open;
+               for(curr_open=open.begin();curr_open!=open.end();curr_open++){
+                   if((curr_children == curr_open) && (curr_children->g > curr_open->g)){
+                       continue;
+                   }
+               }
+               
+               open.push_back(*curr_children);
            }
-           
-           
-       }
-       
+       }       
+    }
+    
+    cout << "chega\n";
+    std::list<point>::iterator path_it;
+    
+    for(path_it=path.begin();path_it!=path.end();path_it++){
+        cout << "x: " << path_it->x << " y: " << path_it->y << "\n";
+        for(int it = path_it->x-9; it <= path_it->x+8;it++){
+            for(int it2 = path_it->y-9; it2 <= path_it->y+8; it2++){
+                M1[it2][it] = 1;
+            }
+        }
+    }
+    
+    Mat img(height, width, CV_8UC4, Scalar(0,0,0,255));
+    
+
+    
+    if (img.empty()) 
+    {
+        cout << "\n Image not created. You"
+                     " have done something wrong. \n";
+        return -1;    // Unsuccessful.
+    }
+
+//    int     GCUT[height][width]; ok
+//    int     M1[height][width]; ok
+//    int     LIG[height][width]; ok
+//    int     FIN[height][width]; ok
+//    int     CGATE[height][width]; ok
+//    int     LISD[height][width]; ok
+//    int     SDT[height][width]; ok
+//    int     CACTIVE[height][width];
+//    int    SIGNAL[height][width];
+    
+    for(int it=0; it<height; it++){
+        for(int it2=0; it2<width; it2++){
+            if(CGATE[it][it2] == 1){
+                img.at<Vec4b>(it, it2) = Vec4b(0, 0, 255, 100);                
+            }
+            if(GCUT[it][it2] == 1){
+                img.at<Vec4b>(it, it2) = Vec4b(255, 0, 255, 100);                
+            }
+            if(LIG[it][it2] == 1){
+                img.at<Vec4b>(it, it2) = Vec4b(0, 157, 255, 100);                
+            }
+
+            if(CACTIVE[it][it2] == 1){
+                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 0, 100);                
+            } 
+            if(LISD[it][it2] == 1){
+                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 255, 100);                
+            }  
+            if(SDT[it][it2] == 1){
+                img.at<Vec4b>(it, it2) = Vec4b(255, 255, 255, 50);                
+            }
+            if(FIN[it][it2] == 1){
+                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 0, 100);                
+            }           
+            if(M1[it][it2] == 1){
+                img.at<Vec4b>(it, it2) = Vec4b(255, 0, 0, 255);                
+            } 
+        }
+    }
+    
+    vector <Mat> dst;
+    Mat gate(height, width, CV_8UC4, Scalar(0,0,0,0));
+    Mat gcut(height, width, CV_8UC4, Scalar(0,0,0,0));
+    Mat lig(height, width, CV_8UC4, Scalar(0,0,0,0));
+    Mat m1(height, width, CV_8UC4, Scalar(0,0,0,0));
+    Mat active(height, width, CV_8UC4, Scalar(0,0,0,0));
+    Mat lisd(height, width, CV_8UC4, Scalar(0,0,0,0));
+    Mat sdt(height, width, CV_8UC4, Scalar(0,0,0,0));
+    Mat cfin(height, width, CV_8UC4, Scalar(0,0,0,0));
+    
+    for(int it=0; it<height; it++){
+        for(int it2=0; it2<width; it2++){
+            if(CGATE[it][it2] == 1){
+                gate.at<Vec4b>(it, it2) = Vec4b(0, 0, 255, 255);                
+            }
+            if(GCUT[it][it2] == 1){
+                gcut.at<Vec4b>(it, it2) = Vec4b(255, 0, 255, 255);                
+            }
+            if(LIG[it][it2] == 1){
+                lig.at<Vec4b>(it, it2) = Vec4b(0, 157, 255, 255);                
+            }
+
+            if(CACTIVE[it][it2] == 1){
+                active.at<Vec4b>(it, it2) = Vec4b(0, 255, 0,255);                
+            } 
+            if(LISD[it][it2] == 1){
+                lisd.at<Vec4b>(it, it2) = Vec4b(0, 255, 255,255);                
+            }  
+            if(SDT[it][it2] == 1){
+                sdt.at<Vec4b>(it, it2) = Vec4b(255, 255, 255,255);                
+            }
+            if(FIN[it][it2] == 1){
+                cfin.at<Vec4b>(it, it2) = Vec4b(0, 255, 0,255);                
+            }           
+            if(M1[it][it2] == 1){
+                m1.at<Vec4b>(it, it2) = Vec4b(255, 0, 0,255);                
+            } 
+        }
+    }
+
+    dst.push_back(gate);
+    dst.push_back(gcut);
+    dst.push_back(lig);
+    dst.push_back(m1);
+    dst.push_back(active);
+    dst.push_back(lisd);    
+    dst.push_back(sdt);
+    dst.push_back(cfin);
+    
+    Mat merged(height, width, CV_8UC4, Scalar(0,0,0,0));
+    
+    merged = dst[0];
+    
+    for(Mat mat : dst){
+        cv::addWeighted(merged, 1, mat, 0.5, 0, merged);
     }
     
     
     
+    cv::imwrite("layout.png", img);
     
+    cv::imwrite("gate.png", gate);
+    cv::imwrite("gcut.png", gcut);
+    cv::imwrite("lig.png", lig);
+    cv::imwrite("m1.png", m1);
+    cv::imwrite("active.png", active);
+    cv::imwrite("lisd.png", lisd);
+    cv::imwrite("sdt.png", sdt);
+    cv::imwrite("cfin.png", cfin);
     
+    cv::imwrite("merged.png", merged);  
     
+    //for(int it=0; it<height; it++){
+    //    for(int it2=0; it2<width; it2++){
+    //       
+    //    }
+    //}
     
     
     
