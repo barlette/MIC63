@@ -39,6 +39,7 @@ struct point2{
 
 struct signal{
     vector <point2> instances;
+    vector <int> visited;
 };
 #endif /* VIEW_H */
 

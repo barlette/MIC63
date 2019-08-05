@@ -235,12 +235,13 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                 }
                 point2 temp((ligcontxcoord+(ligContWidth/2)), (ligcontycoord+(ligContHeight/2)));
                 mSignal[new_ppos[it]].instances.push_back(temp);
+                mSignal[new_ppos[it]].visited.push_back(0);
                 ligcontxcoord = ligcontxcoord + 54;
                 sxcoord = sxcoord + 25;
             } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] != p_pos_types[it-1]) && (p_pos_types[it] == ACTIVE) && (it != 0)){
-                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
-                mSignal[new_ppos[it]].instances.push_back(temp);
-                
+//                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+//                mSignal[new_ppos[it]].instances.push_back(temp);
+//                mSignal[new_ppos[it]].visited.push_back(0);
                 if(global[new_ppos[it]].name == "VDD") {
                     cout << "teste1\n";
                     for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
@@ -255,11 +256,15 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                             SIGNAL[it3][it2] = new_ppos[it]+1;
                         }
                     }
+                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                mSignal[new_ppos[it]].instances.push_back(temp);
+                mSignal[new_ppos[it]].visited.push_back(0);
                 }
                 sxcoord = sxcoord + 29;
             } else if((global[new_ppos[it]].name != global[new_ppos[it-1]].name) && (p_pos_types[it] == p_pos_types[it-1]) && (it != 0)){
-                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
-                mSignal[new_ppos[it]].instances.push_back(temp);
+//                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+//                mSignal[new_ppos[it]].instances.push_back(temp);
+//                mSignal[new_ppos[it]].visited.push_back(0);
                 sxcoord = sxcoord+79;
                 if(global[new_ppos[it]].name == "VDD") {
                     for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
@@ -273,11 +278,15 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                             SIGNAL[it3][it2] = new_ppos[it]+1;
                         }
                     }
+                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                mSignal[new_ppos[it]].instances.push_back(temp);
+                mSignal[new_ppos[it]].visited.push_back(0);
                 }
                 sxcoord = sxcoord + 29;
             } else if(it == 0){
-                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
-                mSignal[new_ppos[it]].instances.push_back(temp);
+//                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+//                mSignal[new_ppos[it]].instances.push_back(temp);
+//                mSignal[new_ppos[it]].visited.push_back(0);
                 if(global[new_ppos[it]].name == "VDD") {
                     for(int it2=sxcoord;it2<sxcoord+actWidth;it2++){
                         for(int it3=salimcoord; it3<salimcoord+salimHeight;it3++){
@@ -290,6 +299,9 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                             SIGNAL[it3][it2] = new_ppos[it]+1;
                         }
                     }
+                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                mSignal[new_ppos[it]].instances.push_back(temp);
+                mSignal[new_ppos[it]].visited.push_back(0);
                 }
                 sxcoord = sxcoord + 29;
             }
@@ -313,13 +325,18 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                             SIGNAL[it3][it2] = new_npos[it]+1;
                         }
                     }
-                }
                 point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
                 mSignal[new_npos[it]].instances.push_back(temp);
+                mSignal[new_ppos[it]].visited.push_back(0);
+                }
+//                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+//                mSignal[new_npos[it]].instances.push_back(temp);
+//                mSignal[new_ppos[it]].visited.push_back(0);
                 sxcoord = sxcoord + 54;
             } else if((global[new_npos[it]].name != global[new_npos[it-1]].name) && (n_pos_types[it] == n_pos_types[it-1])/*&& (it != 0)*/){
-                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
-                mSignal[new_npos[it]].instances.push_back(temp);
+//                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+//                mSignal[new_npos[it]].instances.push_back(temp);
+//                mSignal[new_ppos[it]].visited.push_back(0);
                 cout << it-1 << " " << it << "\n";
                 sxcoord = sxcoord+54;
                 if(global[new_npos[it]].name == "GND") {
@@ -334,6 +351,10 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                             SIGNAL[it3][it2] = new_npos[it]+1;
                         }
                     }
+                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                mSignal[new_npos[it]].instances.push_back(temp);
+                mSignal[new_ppos[it]].visited.push_back(0);
+    
                 sxcoord = sxcoord + 54;
                 }
             }
@@ -590,149 +611,10 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
             cout << "\n";
         }   
 
+
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-//    Mat img(height, width, CV_8UC4, Scalar(0,0,0,255));
-//    
-//
-//    
-//    if (img.empty()) 
-//    {
-//        cout << "\n Image not created. You"
-//                     " have done something wrong. \n";
-//        return -1;    // Unsuccessful.
-//    }
-//
-////    int     GCUT[height][width]; ok
-////    int     M1[height][width]; ok
-////    int     LIG[height][width]; ok
-////    int     FIN[height][width]; ok
-////    int     CGATE[height][width]; ok
-////    int     LISD[height][width]; ok
-////    int     SDT[height][width]; ok
-////    int     CACTIVE[height][width];
-////    int    SIGNAL[height][width];
-//    
-//    for(int it=0; it<height; it++){
-//        for(int it2=0; it2<width; it2++){
-//            if(CGATE[it][it2] == 1){
-//                img.at<Vec4b>(it, it2) = Vec4b(0, 0, 255, 100);                
-//            }
-//            if(GCUT[it][it2] == 1){
-//                img.at<Vec4b>(it, it2) = Vec4b(255, 0, 255, 100);                
-//            }
-//            if(LIG[it][it2] == 1){
-//                img.at<Vec4b>(it, it2) = Vec4b(0, 157, 255, 100);                
-//            }
-//            if(M1[it][it2] == 1){
-//                img.at<Vec4b>(it, it2) = Vec4b(255, 0, 0, 100);                
-//            } 
-//            if(CACTIVE[it][it2] == 1){
-//                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 0, 100);                
-//            } 
-//            if(LISD[it][it2] == 1){
-//                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 255, 100);                
-//            }  
-//            if(SDT[it][it2] == 1){
-//                img.at<Vec4b>(it, it2) = Vec4b(255, 255, 255, 50);                
-//            }
-//            if(FIN[it][it2] == 1){
-//                img.at<Vec4b>(it, it2) = Vec4b(0, 255, 0, 100);                
-//            }           
-//        }
-//    }
-//    
-//    vector <Mat> dst;
-//    Mat gate(height, width, CV_8UC4, Scalar(0,0,0,0));
-//    Mat gcut(height, width, CV_8UC4, Scalar(0,0,0,0));
-//    Mat lig(height, width, CV_8UC4, Scalar(0,0,0,0));
-//    Mat m1(height, width, CV_8UC4, Scalar(0,0,0,0));
-//    Mat active(height, width, CV_8UC4, Scalar(0,0,0,0));
-//    Mat lisd(height, width, CV_8UC4, Scalar(0,0,0,0));
-//    Mat sdt(height, width, CV_8UC4, Scalar(0,0,0,0));
-//    Mat cfin(height, width, CV_8UC4, Scalar(0,0,0,0));
-//    
-//    for(int it=0; it<height; it++){
-//        for(int it2=0; it2<width; it2++){
-//            if(CGATE[it][it2] == 1){
-//                gate.at<Vec4b>(it, it2) = Vec4b(0, 0, 255, 255);                
-//            }
-//            if(GCUT[it][it2] == 1){
-//                gcut.at<Vec4b>(it, it2) = Vec4b(255, 0, 255, 255);                
-//            }
-//            if(LIG[it][it2] == 1){
-//                lig.at<Vec4b>(it, it2) = Vec4b(0, 157, 255, 255);                
-//            }
-//            if(M1[it][it2] == 1){
-//                m1.at<Vec4b>(it, it2) = Vec4b(255, 0, 0,255);                
-//            } 
-//            if(CACTIVE[it][it2] == 1){
-//                active.at<Vec4b>(it, it2) = Vec4b(0, 255, 0,255);                
-//            } 
-//            if(LISD[it][it2] == 1){
-//                lisd.at<Vec4b>(it, it2) = Vec4b(0, 255, 255,255);                
-//            }  
-//            if(SDT[it][it2] == 1){
-//                sdt.at<Vec4b>(it, it2) = Vec4b(255, 255, 255,255);                
-//            }
-//            if(FIN[it][it2] == 1){
-//                cfin.at<Vec4b>(it, it2) = Vec4b(0, 255, 0,255);                
-//            }           
-//        }
-//    }
-//
-//    dst.push_back(gate);
-//    dst.push_back(gcut);
-//    dst.push_back(lig);
-//    dst.push_back(m1);
-//    dst.push_back(active);
-//    dst.push_back(lisd);    
-//    dst.push_back(sdt);
-//    dst.push_back(cfin);
-//    
-//    Mat merged(height, width, CV_8UC4, Scalar(0,0,0,0));
-//    
-//    merged = dst[0];
-//    
-//    for(Mat mat : dst){
-//        cv::addWeighted(merged, 1, mat, 0.5, 0, merged);
-//    }
-//    
-//    
-//    
-//    cv::imwrite("layout.png", img);
-//    
-//    cv::imwrite("gate.png", gate);
-//    cv::imwrite("gcut.png", gcut);
-//    cv::imwrite("lig.png", lig);
-//    cv::imwrite("m1.png", m1);
-//    cv::imwrite("active.png", active);
-//    cv::imwrite("lisd.png", lisd);
-//    cv::imwrite("sdt.png", sdt);
-//    cv::imwrite("cfin.png", cfin);
-//    
-//    cv::imwrite("merged.png", merged);
-    
-    //namedWindow("A_good_name");    
-    //imshow("A_good_name", img);
-    //waitKey(1000); //wait infinite time for a keypress
-    //destroyWindow("A_good_name"); 
-    
-    //ROTEAMENTO
+ //ROTEAMENTO
     
     int POINTS[height][width];
     
@@ -747,38 +629,59 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
     
 //    //select first route
     int temp_distance=0, first=0, distance, s, f, o;
-    
-    
-    for(int it=0; it<global.size();it++){
+    int still_routing=1;
+    while(still_routing){
+        
+        for(int it=0; it<global.size();it++){
         if(mSignal[it].instances.size() > 1){
+            first=0;
             for(int it2=0; it2<mSignal[it].instances.size();it2++){
                 for(int it3=0; it3<mSignal[it].instances.size();it3++){
                     temp_distance = pow(abs(mSignal[it].instances[it2].s.first - mSignal[it].instances[it3].s.first),2)+pow(abs(mSignal[it].instances[it2].s.second - mSignal[it].instances[it3].s.second),2);
-                    cout << temp_distance << "\n";
-                    if((first == 0) && (temp_distance != 0)){
+                    //cout << temp_distance << "\n";
+                    //cout << mSignal[it].visited[it2] << "\n";
+                    //cout << mSignal[it].visited[it3] << "\n";
+                    if((first == 0) && (temp_distance != 0) && ((mSignal[it].visited[it2] != 1) || (mSignal[it].visited[it3] != 1))){
                         distance = temp_distance;
+                        cout << "first: " << temp_distance << "\n";
                         first = 1;
                         s = it2;
                         f = it3;
                         o = it;
-                    } else if ((temp_distance < distance) && (temp_distance != 0)){
+                    } else if ((temp_distance < distance) && (temp_distance != 0) && ((mSignal[it].visited[it2] != 1) || (mSignal[it].visited[it3] != 1))){
                         distance = temp_distance;
+                        cout << "non-first: " << temp_distance << "\n";
                         s = it2;
                         f = it3;
                         o = it;
-                    }
+                    } /*else if (temp_distance == 0){
+                        //mSignal[it].visited[it2] = 1;
+                        //mSignal[it].visited[it3] = 1;
+                    }*/
                 }
             }
         }
     }
-    
+        still_routing = 0;
+        for(int it=0; it<global.size();it++){
+        if(mSignal[it].instances.size() > 1){
+            for(int it2=0; it2<mSignal[it].instances.size();it2++){
+                    if(mSignal[it].visited[it2] == 0){
+                        still_routing = 1;
+                    }
+            }
+        }
+    }    
+        
+        
     
 
-    
-    
+    mSignal[o].visited[s] = 1;
+    mSignal[o].visited[f] = 1;
+    //}
 
     
-    int stepCost, nc, dist;
+
     point neighbour;
     point neighbours[8];
     neighbours[0] = point( -1, -1 ); 
@@ -789,12 +692,7 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
     neighbours[5] = point( -1,  0 );
     neighbours[6] = point(  0,  1 ); 
     neighbours[7] = point(  1,  0 );
-    
-    bool resultSearch;
-    bool resultFillOpen;
-    
-    //node start.pos(mSignal[o].instances[s].s.first, mSignal[o].instances[s].s.second);
-    //node finish.pos(mSignal[o].instances[f].s.first, mSignal[o].instances[f].s.second);
+
     node start, finish;
     start.pos.x = mSignal[o].instances[s].s.first;
     start.pos.y = mSignal[o].instances[s].s.second;
@@ -932,7 +830,7 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
             }
         }
     }
-    
+    }
     Mat img(height, width, CV_8UC4, Scalar(0,0,0,255));
     
 
