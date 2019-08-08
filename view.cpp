@@ -223,6 +223,7 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
         cout << "it: " << global[new_ppos[it]].name << "\n";
         cout << p_pos_types[it];
             if(p_pos_types[it] == GATE){
+                
                 for(int it2=sxcoord;it2<sxcoord+gateWidth;it2++){
                     for(int it3=43; it3<height-44;it3++){
                         SIGNAL[it3][it2] = new_ppos[it]+1;
@@ -233,7 +234,9 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                         LIG[it3][it2] = 1;
                     }
                 }
+                
                 point2 temp((ligcontxcoord+(ligContWidth/2)), (ligcontycoord+(ligContHeight/2)));
+                //cout << "Sinal é GATE: " << new_ppos[it] << " x: " << temp.s.first << " | y: " << temp.s.second << " \n";
                 mSignal[new_ppos[it]].instances.push_back(temp);
                 mSignal[new_ppos[it]].visited.push_back(0);
                 ligcontxcoord = ligcontxcoord + 54;
@@ -256,7 +259,12 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                             SIGNAL[it3][it2] = new_ppos[it]+1;
                         }
                     }
-                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                    if(global[new_ppos[it]].name == "GND"){
+                        point2 temp2((sxcoord+(actWidth/2)), height-22);
+                        mSignal[new_ppos[it]].instances.push_back(temp2);
+                        mSignal[new_ppos[it]].visited.push_back(0);                        
+                    }
+                    point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
                 mSignal[new_ppos[it]].instances.push_back(temp);
                 mSignal[new_ppos[it]].visited.push_back(0);
                 }
@@ -277,6 +285,11 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                         for(int it3=sycoord; it3<sycoord+sHeigth;it3++){
                             SIGNAL[it3][it2] = new_ppos[it]+1;
                         }
+                    }
+                    if(global[new_ppos[it]].name == "GND"){
+                        point2 temp2((sxcoord+(actWidth/2)), height-22);
+                        mSignal[new_ppos[it]].instances.push_back(temp2);
+                        mSignal[new_ppos[it]].visited.push_back(0);                        
                     }
                 point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
                 mSignal[new_ppos[it]].instances.push_back(temp);
@@ -299,6 +312,11 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                             SIGNAL[it3][it2] = new_ppos[it]+1;
                         }
                     }
+                    if(global[new_ppos[it]].name == "GND"){
+                        point2 temp2((sxcoord+(actWidth/2)), height-22);
+                        mSignal[new_ppos[it]].instances.push_back(temp2);
+                        mSignal[new_ppos[it]].visited.push_back(0);                        
+                    }                
                 point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
                 mSignal[new_ppos[it]].instances.push_back(temp);
                 mSignal[new_ppos[it]].visited.push_back(0);
@@ -325,9 +343,24 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                             SIGNAL[it3][it2] = new_npos[it]+1;
                         }
                     }
-                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
-                mSignal[new_npos[it]].instances.push_back(temp);
-                mSignal[new_ppos[it]].visited.push_back(0);
+                    point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                    cout << "Sinal NMOS: " << new_npos[it] << " x: " << temp.s.first << " | y: " << temp.s.second << " \n";
+                    mSignal[new_npos[it]].instances.push_back(temp);
+                    mSignal[new_npos[it]].visited.push_back(0); 
+                    if(global[new_npos[it]].name == "VDD"){
+                        point2 temp2((sxcoord+(actWidth/2)), 22);
+                        mSignal[new_npos[it]].instances.push_back(temp2);
+                        mSignal[new_npos[it]].visited.push_back(0);                        
+                    }
+                    //                    if(global[new_npos[it].name == "VDD"]){
+//                        point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+//                        mSignal[new_npos[it]].instances.push_back(temp);
+//                        mSignal[new_ppos[it]].visited.push_back(0);
+//                    } else {
+//                        point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+//                        mSignal[new_npos[it]].instances.push_back(temp);
+//                        mSignal[new_ppos[it]].visited.push_back(0);   
+//                    }
                 }
 //                point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
 //                mSignal[new_npos[it]].instances.push_back(temp);
@@ -351,9 +384,15 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                             SIGNAL[it3][it2] = new_npos[it]+1;
                         }
                     }
+                    if(global[new_npos[it]].name == "VDD"){
+                        point2 temp2((sxcoord+(actWidth/2)), 22);
+                        mSignal[new_npos[it]].instances.push_back(temp2);
+                        mSignal[new_npos[it]].visited.push_back(0);                        
+                    }
                 point2 temp((sxcoord+(actWidth/2)), (sycoord+(sHeigth/2)));
+                cout << "Sinal NMOS: " << new_npos[it] << " x: " << temp.s.first << " | y: " << temp.s.second << " \n";
                 mSignal[new_npos[it]].instances.push_back(temp);
-                mSignal[new_ppos[it]].visited.push_back(0);
+                mSignal[new_npos[it]].visited.push_back(0);
     
                 sxcoord = sxcoord + 54;
                 }
@@ -621,47 +660,64 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
     
     
     for(int it=0; it<global.size();it++){
+        cout << global[it].name << "\n";
         for(int it2=0; it2<mSignal[it].instances.size();it2++){
             cout << it << "-> x: " << mSignal[it].instances[it2].s.first << "| y: " << mSignal[it].instances[it2].s.second << "\n";
+            cout << "Visited: " << mSignal[it].visited[it2] << "\n";
         }
     }
-    
     
 //    //select first route
     int temp_distance=0, first=0, distance, s, f, o;
     int still_routing=1;
     while(still_routing){
-        
+       
         for(int it=0; it<global.size();it++){
         if(mSignal[it].instances.size() > 1){
+            cout << "Instance: " << it << "\n";
+            //distance = 
             first=0;
             for(int it2=0; it2<mSignal[it].instances.size();it2++){
                 for(int it3=0; it3<mSignal[it].instances.size();it3++){
                     temp_distance = pow(abs(mSignal[it].instances[it2].s.first - mSignal[it].instances[it3].s.first),2)+pow(abs(mSignal[it].instances[it2].s.second - mSignal[it].instances[it3].s.second),2);
-                    //cout << temp_distance << "\n";
-                    //cout << mSignal[it].visited[it2] << "\n";
-                    //cout << mSignal[it].visited[it3] << "\n";
-                    if((first == 0) && (temp_distance != 0) && ((mSignal[it].visited[it2] != 1) || (mSignal[it].visited[it3] != 1))){
+                    cout << "testeSJSJSJS" << temp_distance << "\n";
+                    cout << "first: " << first << "\n";
+                    cout << "it: " << it << "\n";
+                    cout << "it2: " << it2 << "\n";
+                    cout << "it3: " << it3 << "\n";
+                    cout << "it2 visited: " << mSignal[it].visited[it2] << "\n";
+                    //cout << "it3 visited: " << mSignal[it].visited[it3] << "\n";
+                    cout << "SEGDEV\n";
+                    if((first == 0) && (it3 != it2) && ((mSignal[it].visited[it2] != 1) || (mSignal[it].visited[it3] != 1))){
                         distance = temp_distance;
+                        cout << "PAIR\n";
+                        cout << it << "-> x: " << mSignal[it].instances[it2].s.first << " | y: " << mSignal[it].instances[it2].s.second << "\n";
+                        cout << it << "-> x: " << mSignal[it].instances[it3].s.first << " | y: " << mSignal[it].instances[it3].s.second << "\n";
+                        cout << "PAIR\n";
                         cout << "first: " << temp_distance << "\n";
                         first = 1;
                         s = it2;
                         f = it3;
                         o = it;
-                    } else if ((temp_distance < distance) && (temp_distance != 0) && ((mSignal[it].visited[it2] != 1) || (mSignal[it].visited[it3] != 1))){
+                    } else if ((temp_distance < distance) && (it3 != it2) && ((mSignal[it].visited[it2] != 1) || (mSignal[it].visited[it3] != 1))){
                         distance = temp_distance;
+                        cout << "PAIR\n";
+                        cout << it << "-> x: " << mSignal[it].instances[it2].s.first << " | y: " << mSignal[it].instances[it2].s.second << "\n";
+                        cout << it << "-> x: " << mSignal[it].instances[it3].s.first << " | y: " << mSignal[it].instances[it3].s.second << "\n";
+                        cout << "PAIR\n";
                         cout << "non-first: " << temp_distance << "\n";
                         s = it2;
                         f = it3;
                         o = it;
-                    } /*else if (temp_distance == 0){
+                    } //else if (temp_distance == 0){
                         //mSignal[it].visited[it2] = 1;
                         //mSignal[it].visited[it3] = 1;
-                    }*/
+                    //}
                 }
             }
         }
     }
+        cout << "if still routing\n";
         still_routing = 0;
         for(int it=0; it<global.size();it++){
         if(mSignal[it].instances.size() > 1){
@@ -669,29 +725,16 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                     if(mSignal[it].visited[it2] == 0){
                         still_routing = 1;
                     }
+                }
             }
-        }
-    }    
+        }    
         
         
     
 
     mSignal[o].visited[s] = 1;
     mSignal[o].visited[f] = 1;
-    //}
 
-    
-
-    point neighbour;
-    point neighbours[8];
-    neighbours[0] = point( -1, -1 ); 
-    neighbours[1] = point(  1, -1 );
-    neighbours[2] = point( -1,  1 ); 
-    neighbours[3] = point(  1,  1 );
-    neighbours[4] = point(  0, -1 ); 
-    neighbours[5] = point( -1,  0 );
-    neighbours[6] = point(  0,  1 ); 
-    neighbours[7] = point(  1,  0 );
 
     node start, finish;
     start.pos.x = mSignal[o].instances[s].s.first;
@@ -742,41 +785,48 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
        open.remove(current_node);
        closed.push_back(current_node);
        point parent;
-       if(current_node == finish){
-           cout << "Encontrou um caminho. current pos -> x: " << current_node.pos.x << " y: " << current_node.pos.y;
+       for(int xit = current_node.pos.x-9; xit <= current_node.pos.x+9;xit++)
+       {
+           for(int yit = current_node.pos.y-9; yit <= current_node.pos.y+9;yit++){
+               if((yit == finish.pos.y) && (xit == finish.pos.x)){
+                    cout << "Encontrou um caminho. current pos -> x: " << current_node.pos.x << " y: " << current_node.pos.y;
            
-           parent = current_node.pos;
-           cout << "222 x: " << start.pos.x << " y: " << start.pos.y << "\n";
+                    parent = current_node.pos;
+                    cout << "222 x: " << start.pos.x << " y: " << start.pos.y << "\n";
            
-           while ((parent.x != start.pos.x) || (parent.y != start.pos.y)){
-               cout << "Construindo path\n";
-               path.push_back(parent);
-               parent = current_node.parent;
+                    while ((parent.x != start.pos.x) || (parent.y != start.pos.y)){
+                       cout << "Construindo path\n";
+                       path.push_back(parent);
+                       parent = current_node.parent;
                
-               for(std::list<node>::iterator it=closed.begin();it!=closed.end();it++){
-                   if((it->pos.x == parent.x) && (it->pos.y == parent.y)){
-                       current_node = *it;
-                   }
+                    for(std::list<node>::iterator it=closed.begin();it!=closed.end();it++){
+                        if((it->pos.x == parent.x) && (it->pos.y == parent.y)){
+                            current_node = *it;
+                        }
+                    }
+                        
+                    cout << "Parent pos -> x: " << parent.x << " y: " << parent.y;
+                    }
+                    //break;
+                    found_path = 1;
                }
-               cout << "Parent pos -> x: " << parent.x << " y: " << parent.y;
            }
-           //break;
-           found_path = 1;
-           
-       } else {
+       }
+       if(!found_path) {
            cout << "else clausule\n";
            vector<point> surr;
+           int step=18;
            point temp;
            temp.x = 0;
-           temp.y = -1;
+           temp.y = -step;
            surr.push_back(temp);
            temp.x = 0;
-           temp.y = 1;
+           temp.y = step;
            surr.push_back(temp);
-           temp.x = -1;
+           temp.x = -step;
            temp.y = 0;
            surr.push_back(temp);
-           temp.x = 1;
+           temp.x = step;
            temp.y = 0;
            surr.push_back(temp);
            
@@ -802,10 +852,49 @@ int renderizeMatrix(vector<int> p_pos, vector<Net> netlist_p, vector<int> n_pos,
                        continue;
                    }
                }
-               
-               curr_children->g = current_node.g + 1;
-               curr_children->h = (pow(curr_children->pos.x - finish.pos.x,2) + pow(curr_children->pos.y - finish.pos.y,2));
-               curr_children->f = curr_children->g + curr_children->h;
+           
+               int break_cost=1100, detect_superpos=0, superpos_cost=1000;
+           if((current_node.parent.x == current_node.pos.x+step) || (current_node.parent.x == current_node.pos.x-step)){
+               cout << "Horizontal move\n";
+               for(int xdetc = curr_children->pos.x-9; xdetc <= curr_children->pos.x+9; xdetc++){
+                   for(int ydetc = curr_children->pos.y-9; ydetc <= curr_children->pos.y+9; ydetc++){
+                       if(SIGNAL[xdetc][ydetc] != 0){
+                           detect_superpos = 1;
+                       }
+                   }
+               }
+               if((curr_children->pos.x == current_node.pos.x+step) || (curr_children->pos.x == current_node.pos.x-step)){
+                    curr_children->g = current_node.g + 1;
+                    curr_children->h = (pow(curr_children->pos.x - finish.pos.x,2) + pow(curr_children->pos.y - finish.pos.y,2));
+                    curr_children->f = curr_children->g + curr_children->h;
+               } else if(detect_superpos){
+                   curr_children->g = current_node.g + superpos_cost;
+                   curr_children->h = (pow(curr_children->pos.x - finish.pos.x,2) + pow(curr_children->pos.y - finish.pos.y,2));
+                   curr_children->f = curr_children->g + curr_children->h;
+               }else {
+                   curr_children->g = current_node.g + break_cost;
+                   curr_children->h = (pow(curr_children->pos.x - finish.pos.x,2) + pow(curr_children->pos.y - finish.pos.y,2));
+                   curr_children->f = curr_children->g + curr_children->h;
+               }
+           } else if ((current_node.parent.y == current_node.pos.y+step) || (current_node.parent.y == current_node.pos.y-step)){
+               cout << "Vertical mode\n";
+               if((curr_children->pos.y == current_node.pos.y+step) || (curr_children->pos.y == current_node.pos.y-step)){
+                    curr_children->g = current_node.g + 1;
+                    curr_children->h = (pow(curr_children->pos.x - finish.pos.x,2) + pow(curr_children->pos.y - finish.pos.y,2));
+                    curr_children->f = curr_children->g + curr_children->h;
+               } else if(detect_superpos){
+                   curr_children->g = current_node.g + superpos_cost;
+                   curr_children->h = (pow(curr_children->pos.x - finish.pos.x,2) + pow(curr_children->pos.y - finish.pos.y,2));
+                   curr_children->f = curr_children->g + curr_children->h;
+               } else {
+                   curr_children->g = current_node.g + break_cost;
+                   curr_children->h = (pow(curr_children->pos.x - finish.pos.x,2) + pow(curr_children->pos.y - finish.pos.y,2));
+                   curr_children->f = curr_children->g + curr_children->h;
+               }
+           }    
+//               curr_children->g = current_node.g + 1;
+//               curr_children->h = (pow(curr_children->pos.x - finish.pos.x,2) + pow(curr_children->pos.y - finish.pos.y,2));
+//               curr_children->f = curr_children->g + curr_children->h;
            
                std::list<node>::iterator curr_open;
                for(curr_open=open.begin();curr_open!=open.end();curr_open++){
